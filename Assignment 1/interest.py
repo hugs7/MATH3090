@@ -92,6 +92,19 @@ def continuous_compound_interest_discounted(interest_rate: float, maturity_yrs: 
     return beta
 
 
+def check_integration_error(error: float):
+    """
+    Check if the integration error is too high.
+
+    Args:
+        error: float
+            The integration error.
+    """
+
+    if error > 1e-6:
+        print(f"Warning: High integration error. Val: {error}")
+
+
 def nonconstant_yield_accumulated(yield_function: callable, maturity_yrs: int):
     """
     Calculate the accumulated ratio of a sum of money after a given number of years at a given nonconstant yield.
@@ -107,7 +120,10 @@ def nonconstant_yield_accumulated(yield_function: callable, maturity_yrs: int):
             The accumulated ratio of the sum of money.
     """
 
-    alpha = integrate.quad(yield_function, 0, maturity_yrs)
+    int_val, error = integrate.quad(yield_function, 0, maturity_yrs)
+    check_integration_error(error)
+
+    alpha = math.exp(int_val)
 
     return alpha
 
@@ -127,6 +143,9 @@ def nonconstant_yield_discounted(yield_function: callable, maturity_yrs: int):
             The discounted ratio of the sum of money.
     """
 
-    beta = integrate.quad(yield_function, 0, maturity_yrs)
+    int_val, error = integrate.quad(yield_function, 0, maturity_yrs)
+    check_integration_error(error)
+
+    beta = math.exp(-int_val)
 
     return beta
