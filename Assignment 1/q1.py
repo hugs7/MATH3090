@@ -7,6 +7,8 @@ import bond
 
 BREAK_WIDTH = 100
 
+QUARTLERLY = 4
+
 
 def display_question(question_number: int, question_text: str):
     """
@@ -33,7 +35,7 @@ def display_answer(answer_value: float, decimal_places: int = 2):
             The value of the answer.
     """
 
-    print(f"{Fore.GREEN}Answer:{Style.RESET_ALL}")
+    print(f"{Fore.GREEN}Answer:{Style.RESET_ALL} ", end="")
     print(f"${round(answer_value, decimal_places)}")
     print("-"*BREAK_WIDTH)
 
@@ -82,7 +84,6 @@ def q1():
         face_value, years_to_maturity, yield_function)
     display_question(q, subquestions[q])
     display_answer(price_iii)
-    return
 
     # Part b (3 marks)
     print("Part B:")
@@ -91,7 +92,13 @@ def q1():
     face_value = 10_000
     years_to_maturity = 10
     coupon_rate = 0.05
-    yield_rate = 0.07
+    interest_rate = 0.07
+    compounding_frequency_yr = QUARTLERLY
+
+    price_b = bond.price_coupon_bearing_bond_discrete(
+        face_value, years_to_maturity, coupon_rate, interest_rate, compounding_frequency_yr)
+
+    display_answer(price_b)
 
 
 def __main__():
