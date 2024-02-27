@@ -1,0 +1,11 @@
+# Exclude .mkv and .mk4 files
+*.mkv
+*.mk4
+
+# Exclude zip files
+**.zip
+
+# Python cache
+**/.idea
+**/venv
+**__pycache__
