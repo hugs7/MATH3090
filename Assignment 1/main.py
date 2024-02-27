@@ -101,8 +101,25 @@ def q1():
     display_answer(price_b)
 
 
+def q2():
+    print("Question 2:")
+    print("Consider the cash flow C_0 = -3x, C_1 = 5, C_2 = x")
+    print("(at periods 0, 1, 2 respectively) for some x > 0")
+
+    # Part a (3 marks)
+    print("Apply the discount process d(k) = (1 + r)^(-k) so that the present value is")
+    print("P = sum_{k=0}^2 d(k) C_k")
+    print("What is the range of x such that P > 0 when r = 5%?")
+
+    r = 0.05
+
+    # P = -3x + 5(1 + r)^(-1) + x(1 + r)^(-2)
+
+
 def __main__():
     q1()
+
+    q2()
 
     return 0
 
