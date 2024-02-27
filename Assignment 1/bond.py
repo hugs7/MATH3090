@@ -147,10 +147,8 @@ def price_coupon_bearing_bond_discrete(face_value: int, years_to_maturity: int, 
     price += coupon_value
 
     # Add the face value discounted to the present
-    beta = interest.discrete_compound_interest_discounted(
-        interest_rate, years_to_maturity, compounding_frequency_yr)
-    print("beta", beta)
-    discounted_face_value = face_value * beta
+    discounted_face_value = price_zero_coupon_bond_discrete(
+        face_value, years_to_maturity, interest_rate, compounding_frequency_yr)
     price += discounted_face_value
 
     return price
