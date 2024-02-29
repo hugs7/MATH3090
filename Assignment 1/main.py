@@ -43,6 +43,7 @@ def q1():
 
     display.display_question(q, subquestions[q])
     display.display_answer(price_i)
+    
     # Question ii
     q = "ii"
     interest_rate = 0.08
