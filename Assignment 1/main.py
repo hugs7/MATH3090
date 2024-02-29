@@ -2,8 +2,13 @@
 # Date: 27/02/2024
 
 import math
+from typing import Dict
 from colorama import Fore, Style
+
 import bond
+import interest
+import plot
+import numpy as np
 
 BREAK_WIDTH = 100
 
@@ -112,6 +117,32 @@ def q2():
     print("What is the range of x such that P > 0 when r = 5%?")
 
     r = 0.05
+    cash_flow = lambda k, x: -3*x if k == 0 else (5 if k == 1 else x)
+
+    # Function to calculate present value based on some value of x
+    def present_value(x: float) -> float:
+        present_value = 0
+
+        for k in range(2 + 1):
+            beta = interest.discrete_compound_interest_discounted(r, k, 1)
+            undiscounted_cash_flow_year_k = cash_flow(k, x)
+            discounted_cash_flow_year_k = undiscounted_cash_flow_year_k * beta
+
+            present_value += discounted_cash_flow_year_k
+
+        print("x:", x, "P:", present_value)
+        return present_value
+
+    cash_flows_x: Dict[float, float] = {}
+    # Loop over a wide range of x
+    for x in np.arange(-100, 100.0, 0.01):
+        cash_flow_x = present_value(x)
+
+        cash_flows_x[x] = cash_flow_x
+
+    # Visualise cash flow on a graph
+    plot.plot_dictionary(cash_flows_x, "x", "P", "Present value of cash flow")  
+
 
     # P = -3x + 5(1 + r)^(-1) + x(1 + r)^(-2)
 
