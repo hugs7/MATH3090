@@ -12,3 +12,5 @@
 
 # Exclude PDF files
 *.pdf
+
+*.json
