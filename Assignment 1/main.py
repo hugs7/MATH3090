@@ -7,12 +7,14 @@ from colorama import Fore, Style
 
 import bond
 import interest
-import plot
 import numpy as np
+import sys
 
 BREAK_WIDTH = 100
 
 QUARTLERLY = 4
+
+EPS = 0.01
 
 
 def display_question(question_number: int, question_text: str):
@@ -180,6 +182,8 @@ def q2():
     
     xr_grid = {}
 
+    accept_xr = []
+
     for r in np.arange(0.0, 1.0, 0.01):
         for x in np.arange(x_min, x_max, x_step):
             p = present_value(x)
@@ -187,22 +191,35 @@ def q2():
             # if p == 0:
             xr_grid[(x, r)] = p
             # print(f"{round(x, 3):<6}, {round(r, 3):<6}, {round(p, 3):<6}")
+
+            if abs(p) < EPS:
+                print(f"{round(p, 2):<6}, {round(x, 3):<6}, {round(r, 2):<6}")
+                accept_xr.append((x, r))
+
+
+def q3():
+    pass
+
+
+def main():
+    if len(sys.argv) > 1 and sys.argv[1].isdigit():
+        question_number = int(sys.argv[1])
+        if question_number == 1:
+            q1()
+        elif question_number == 2:
+            q2()
+        elif question_number == 3:
+            q3()
+        else:
+            print("Invalid question number")
+    else:
+        # Run all questions
+        q1()
+        q2()
+        q3()
     
-
-
-    # Print a 3d grid of x and r
-    plot.plot_3d_dictionary(xr_grid, "x", "r", "P", "Present value of cash flow")
-
-
-
-
-def __main__():
-    q1()
-
-    q2()
-
     return 0
 
 
 if __name__ == "__main__":
-    __main__()
+    main()
