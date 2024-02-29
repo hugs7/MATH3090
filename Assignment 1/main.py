@@ -229,9 +229,6 @@ def q3():
     display_answer(approx, 5)
 
 
-
-
-
 def main():
     if len(sys.argv) > 1 and sys.argv[1].isdigit():
         question_number = int(sys.argv[1])
