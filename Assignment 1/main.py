@@ -4,11 +4,12 @@
 import math
 from typing import Dict
 from colorama import Fore, Style
+import numpy as np
+import sys
 
 import bond
 import interest
-import numpy as np
-import sys
+import newtons
 
 BREAK_WIDTH = 100
 
@@ -198,7 +199,37 @@ def q2():
 
 
 def q3():
-    pass
+    print("Question 3")
+    print("In this question, consider a bond with the set of cashflows given in Table 1. Here, note that the face " +
+          "value F is already included in the last cashflow. Let y be the yield to maturity, t_i, be the time of the "+ 
+          "ith cashflow, C_i, and PV = 100 be the market price of the bond at t = 0. Assume continuous compounding. "+ 
+          "Then, y solves PV = \sum_{i=1} C_i e^{-yt_i}.")
+    
+    # Part a (3 marks)
+    print("Part a (3 marks)")
+    print("Write out the Newton iteration to compute y_{n+1} from y_{n}. Specifically, clearly indicate the "+ 
+          "functions f(y) and f'(y)")
+    
+    cashflows = [2.3, 2.9, 3.0, 3.2, 4.0, 3.8, 4.2, 4.8, 5.5, 105]
+    
+    f = lambda y: sum(cashflows[t] * interest.continuous_compound_interest_discounted(y, t) for t in range(len(cashflows)))
+    f_prime = lambda y: -sum(((t * cashflows[t]) / ((1 + y)**(t + 1))) for t in range(len(cashflows)))
+
+    # Part b (5 marks)
+    print("Part b (5 marks)")
+    print("Implement the above Newton iteration in code using the stopping criteria")
+    print("|y_{n+1} - y_n| < 10^{-8})")
+
+    eps = 10e-8
+    # Set initial y value
+    x_0 = 0.05
+
+    approx = newtons.newtons(f, f_prime, x_0, eps, 9999999)
+
+    display_answer(approx, 5)
+
+
+
 
 
 def main():
