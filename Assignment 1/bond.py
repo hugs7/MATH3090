@@ -126,8 +126,7 @@ def price_coupon_bearing_bond_discrete(face_value: int, years_to_maturity: int, 
 
         coupon_rate_adjusted = coupon_rate_annual / compounding_frequency_yr
 
-        numerator = (1 - ((1 + interest_rate / compounding_frequency_yr)
-                          ** (-years_to_maturity * compounding_frequency_yr)))
+        numerator = (1 - interest.discrete_compound_interest_discounted(interest_rate, years_to_maturity, compounding_frequency_yr))
 
         denominator = interest_rate / compounding_frequency_yr
 
