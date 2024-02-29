@@ -3,49 +3,18 @@
 
 import math
 from typing import Dict
-from colorama import Fore, Style
 import numpy as np
 import sys
 
 import bond
 import interest
 import newtons
-
-BREAK_WIDTH = 100
+import display
 
 QUARTLERLY = 4
 
 EPS = 0.01
 
-
-def display_question(question_number: int, question_text: str):
-    """
-    Display a question.
-
-    Args:
-        question_number: int
-            The number of the question.
-        question_text: str
-            The text of the question.
-    """
-
-    print("-"*BREAK_WIDTH)
-    print(f"{Fore.BLUE}Question {question_number}:{Style.RESET_ALL}")
-    print(question_text)
-
-
-def display_answer(answer_value: float, decimal_places: int = 2):
-    """
-    Display an answer.
-
-    Args:
-        answer_value: float
-            The value of the answer.
-    """
-
-    print(f"{Fore.GREEN}Answer:{Style.RESET_ALL}", end="")
-    print(f"${round(answer_value, decimal_places)}")
-    print("-"*BREAK_WIDTH)
 
 
 def q1():
@@ -72,8 +41,8 @@ def q1():
     price_i = bond.price_zero_coupon_bond_discrete(
         face_value, years_to_maturity, interest_rate, compounding_frequency_yr)
 
-    display_question(q, subquestions[q])
-    display_answer(price_i)
+    display.display_question(q, subquestions[q])
+    display.display_answer(price_i)
     # Question ii
     q = "ii"
     interest_rate = 0.08
@@ -81,8 +50,8 @@ def q1():
     price_ii = bond.price_zero_coupon_bond_continuous(
         face_value, years_to_maturity, interest_rate)
 
-    display_question(q, subquestions[q])
-    display_answer(price_ii)
+    display.display_question(q, subquestions[q])
+    display.display_answer(price_ii)
 
     # Question iii
     q = "iii"
@@ -90,8 +59,8 @@ def q1():
 
     price_iii = bond.price_zero_coupon_bond_nonconstant_yield(
         face_value, years_to_maturity, yield_function)
-    display_question(q, subquestions[q])
-    display_answer(price_iii)
+    display.display_question(q, subquestions[q])
+    display.display_answer(price_iii)
 
     # Part b (3 marks)
     print("Part B:")
@@ -106,7 +75,7 @@ def q1():
     price_b = bond.price_coupon_bearing_bond_discrete(
         face_value, years_to_maturity, coupon_rate, interest_rate, compounding_frequency_yr)
 
-    display_answer(price_b)
+    display.display_answer(price_b)
 
 
 def q2():
@@ -226,7 +195,7 @@ def q3():
 
     approx = newtons.newtons(f, f_prime, x_0, eps, 9999999)
 
-    display_answer(approx, 5)
+    display.display_answer(approx, 5)
 
 
 def main():
