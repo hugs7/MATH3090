@@ -112,6 +112,7 @@ def q2():
     print("(at periods 0, 1, 2 respectively) for some x > 0")
 
     # Part a (3 marks)
+    print("Part A (3 marks):")
     print("Apply the discount process d(k) = (1 + r)^(-k) so that the present value is")
     print("P = sum_{k=0}^2 d(k) C_k")
     print("What is the range of x such that P > 0 when r = 5%?")
@@ -135,14 +136,14 @@ def q2():
         return present_value
 
     cash_flows_x: Dict[float, float] = {}
-    min_x = -100.0
-    max_x = 100.0
-    step_x = 0.01
+    x_min = -100.0
+    x_max = 100.0
+    x_step = 0.01
     accept_min_x = None
     accept_max_x = None
     
     # Loop over a wide range of x
-    for x in np.arange(min_x, max_x, step_x):
+    for x in np.arange(x_min, x_max, x_step):
         cash_flow_x = present_value(x)
 
         cash_flows_x[x] = cash_flow_x
@@ -160,10 +161,10 @@ def q2():
             elif x > accept_max_x:
                 accept_max_x = x
 
-    if accept_min_x == min_x:
+    if accept_min_x == x_min:
         accept_min_x = -math.inf
 
-    if accept_max_x == max_x:
+    if accept_max_x == x_max:
         accept_max_x = math.inf
 
     # Visualise cash flow on a graph
@@ -171,7 +172,28 @@ def q2():
 
     print(f"Range of x such that P > 0 when r = 5%: {accept_min_x} < x < {accept_max_x}")
 
-    # P = -3x + 5(1 + r)^(-1) + x(1 + r)^(-2)
+
+    # Part b (3 marks)
+    print("Part B (3 marks):")
+    print("The IRR (internal rate of return) is r such that P = 0. For what range of x will there be", 
+          "a unique strictly positive IRR?")
+    
+    xr_grid = {}
+
+    for r in np.arange(0.0, 1.0, 0.01):
+        for x in np.arange(x_min, x_max, x_step):
+            p = present_value(x)
+
+            # if p == 0:
+            xr_grid[(x, r)] = p
+            print(f"{round(x, 3):<6}, {round(r, 3):<6}, {round(p, 3):<6}")
+    
+    
+
+    # Print a 3d grid of x and r
+    plot.plot_3d_dictionary(xr_grid, "x", "r", "P", "Present value of cash flow")
+
+
 
 
 def __main__():
