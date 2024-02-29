@@ -24,7 +24,7 @@ def derivative(f: callable, x: float, tolerance: float) -> float:
     return f_prime
 
 
-def newtons(f: callable, x_0: float, tolerance: float, max_iterations: int) -> float:
+def newtons(f: callable, f_prime: callable, x_0: float, tolerance: float, max_iterations: int) -> float:
     """
     Calculate the root of a function using Newton's method.
 
@@ -49,12 +49,20 @@ def newtons(f: callable, x_0: float, tolerance: float, max_iterations: int) -> f
 
     for n in range(max_iterations):
         last_x_n = x_n[-1]
-        f_prime = derivative(f, x_n, tolerance)
-        x_n.append(last_x_n - f(x_n) / f_prime)
 
-        x_diff = abs(x_n[-1] - x_n[-2])
-        func_diff = abs(f(x_n))
+        derivative = f_prime(last_x_n)
+        if derivative == 0:
+            raise Exception("Derivative is zero")
 
+        x_n.append(last_x_n - f(last_x_n) / derivative)
+
+        this_x_n = x_n[-1]
+        last_x_n = x_n[-2]
+        
+        print(n, this_x_n)
+
+        x_diff = abs(this_x_n - last_x_n)
+        func_diff = abs(f(this_x_n))
         if min(x_diff, func_diff) < tolerance:
             # The approximation is within the tolerance
             break
