@@ -186,9 +186,9 @@ def q2():
 
             # if p == 0:
             xr_grid[(x, r)] = p
-            print(f"{round(x, 3):<6}, {round(r, 3):<6}, {round(p, 3):<6}")
+            # print(f"{round(x, 3):<6}, {round(r, 3):<6}, {round(p, 3):<6}")
     
-    
+
 
     # Print a 3d grid of x and r
     plot.plot_3d_dictionary(xr_grid, "x", "r", "P", "Present value of cash flow")
