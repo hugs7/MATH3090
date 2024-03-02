@@ -219,6 +219,24 @@ def q3():
         display.display_answer(approx, 10, False)
 
 
+def q4():
+    print("Question 4 (4 marks)")
+    print("In the Constant Growth DDM model, the present value of the share is")
+
+    print("PV = \sum_{t=1}^{\infty} \frac{D_t}{(1 + k)^t}")
+
+    print("where D_1, D_2,... are (non-random) dividends and k > 0 is the required rate of return.")
+    print("Suppose D_0 > 0, k > 0 and g > 0.")
+    print("Derive the formula for the present value (2) when")
+
+    print("D_t = D_0 (1 + g)^{\ceil{t/2}}, t = 1, 2, ...")
+
+    print(
+        "where \ceil{x} is the ceiling function (i.e. the smallest integer greater than or equal to x).")
+
+    print("What is the condition of g so that the PV is finite? To get full marks, you will need to write an explicit expression (without summation).")
+
+
 def main():
     if len(sys.argv) > 1 and sys.argv[1].isdigit():
         question_number = int(sys.argv[1])
