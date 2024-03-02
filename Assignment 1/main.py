@@ -6,6 +6,8 @@ from typing import Dict
 from colorama import Fore
 import numpy as np
 import sys
+from IPython.display import display, Markdown
+
 
 import bond
 import interest
@@ -203,7 +205,7 @@ def q3():
 
     # Solve y using Newton's method given f and PV as inputs
 
-    approx = newtons.newtons_method(f, f_prime, x_0, eps, 9999999)
+    approx, _ = newtons.newtons_method(f, f_prime, x_0, eps, 9999999)
 
     display.display_answer(approx, 5, False)
 
@@ -214,7 +216,7 @@ def q3():
     for y_0 in y_0_vals:
         print(
             f"{Fore.CYAN}y_0 = {Fore.LIGHTRED_EX}{round(y_0, 2)}{Fore.WHITE}", end=": ")
-        approx = newtons.newtons_method(
+        approx, _ = newtons.newtons_method(
             f, f_prime, y_0, eps, 9999999, log=False)
         display.display_answer(approx, 10, False)
 
