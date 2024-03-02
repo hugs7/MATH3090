@@ -25,7 +25,7 @@ def derivative(f: callable, x: float, tolerance: float) -> float:
     return f_prime
 
 
-def newtons_method(f: callable, f_prime: callable, x_0: float, tolerance: float, max_iterations: int, log: bool = True) -> float:
+def newtons_method(f: callable, f_prime: callable, x_0: float, tolerance: float, max_iterations: int, generate_table: bool = False, log: bool = True, col_spaces: list = [], precision: int = 6) -> tuple[float, list]:
     """
     Calculate the root of a function using Newton's method.
 
@@ -50,6 +50,8 @@ def newtons_method(f: callable, f_prime: callable, x_0: float, tolerance: float,
 
     x_n = [x_0]
 
+    md_table_rows = []
+
     for n in range(max_iterations):
         last_x_n = x_n[-1]
 
@@ -62,8 +64,18 @@ def newtons_method(f: callable, f_prime: callable, x_0: float, tolerance: float,
         this_x_n = x_n[-1]
         last_x_n = x_n[-2]
 
-        if log:
-            print(n, this_x_n)
+        diff = abs(this_x_n - last_x_n)
+
+        if log or generate_table:
+            a, b, c = col_spaces
+
+            table_row = f"|{n:^{a}}|{round(this_x_n, precision):^{b}}|{round(diff, precision):^{c}}|"
+
+            if log:
+                print(table_row)
+
+            if generate_table:
+                md_table_rows.append(table_row)
 
         x_diff = abs(this_x_n - last_x_n)
         func_diff = abs(f(this_x_n))
@@ -71,4 +83,4 @@ def newtons_method(f: callable, f_prime: callable, x_0: float, tolerance: float,
             # The approximation is within the tolerance
             break
 
-    return x_n[-1]
+    return x_n[-1], md_table_rows
