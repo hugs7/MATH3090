@@ -45,8 +45,9 @@ def discrete_compound_interest_discounted(interest_rate: float, maturity_yrs: in
             The discounted ratio of the sum of money.
     """
 
-    beta = discrete_compound_interest_accumuated(
-        interest_rate, maturity_yrs, compounding_frequency_yr) ** (-1)
+    exponent = - maturity_yrs * compounding_frequency_yr
+
+    beta = (1 + interest_rate / compounding_frequency_yr) ** exponent
 
     return beta
 
@@ -86,8 +87,7 @@ def continuous_compound_interest_discounted(interest_rate: float, maturity_yrs: 
             The discounted ratio of the sum of money.
     """
 
-    beta = continuous_compound_interest_accumulated(
-        interest_rate, maturity_yrs) ** (-1)
+    beta = math.exp(- interest_rate * maturity_yrs)
 
     return beta
 
