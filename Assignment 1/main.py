@@ -3,6 +3,7 @@
 
 import math
 from typing import Dict
+from colorama import Fore
 import numpy as np
 import sys
 
@@ -180,9 +181,11 @@ def q3():
           "functions f(y) and f'(y)")
 
     cashflows = [2.3, 2.9, 3.0, 3.2, 4.0, 3.8, 4.2, 4.8, 5.5, 105]
+    # Market price of the bond at t = 0
+    PV = 100
 
     def f(y): return sum(
-        cashflows[t] * interest.continuous_compound_interest_discounted(y, t) for t in range(len(cashflows)))
+        cashflows[t-1] * interest.continuous_compound_interest_discounted(y, t) for t in range(1, len(cashflows)+1)) - PV
 
     def f_prime(y): return - \
         sum(((t * cashflows[t]) / ((1 + y)**(t + 1)))
@@ -193,13 +196,27 @@ def q3():
     print("Implement the above Newton iteration in code using the stopping criteria")
     print("|y_{n+1} - y_n| < 10^{-8})")
 
-    eps = 10e-8
+    eps = 1e-8
+
     # Set initial y value
     x_0 = 0.05
 
-    approx = newtons.newtons(f, f_prime, x_0, eps, 9999999)
+    # Solve y using Newton's method given f and PV as inputs
 
-    display.display_answer(approx, 5)
+    approx = newtons.newtons_method(f, f_prime, x_0, eps, 9999999)
+
+    display.display_answer(approx, 5, False)
+
+    # Part ii: Trying larger values of y_0
+    print("Part ii: Trying with larger values of y_0")
+
+    y_0_vals = [x for x in np.arange(0.05, 0.25, 0.01)]
+    for y_0 in y_0_vals:
+        print(
+            f"{Fore.CYAN}y_0 = {Fore.LIGHTRED_EX}{round(y_0, 2)}{Fore.WHITE}", end=": ")
+        approx = newtons.newtons_method(
+            f, f_prime, y_0, eps, 9999999, log=False)
+        display.display_answer(approx, 10, False)
 
 
 def main():
