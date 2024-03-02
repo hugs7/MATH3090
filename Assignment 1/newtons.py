@@ -2,6 +2,7 @@
 Implements Newton's method for approximating function roots
 """
 
+
 def derivative(f: callable, x: float, tolerance: float) -> float:
     """
     Calculate the derivative of a function at a given point.
@@ -24,7 +25,7 @@ def derivative(f: callable, x: float, tolerance: float) -> float:
     return f_prime
 
 
-def newtons(f: callable, f_prime: callable, x_0: float, tolerance: float, max_iterations: int) -> float:
+def newtons_method(f: callable, f_prime: callable, x_0: float, tolerance: float, max_iterations: int, log: bool = True) -> float:
     """
     Calculate the root of a function using Newton's method.
 
@@ -37,6 +38,8 @@ def newtons(f: callable, f_prime: callable, x_0: float, tolerance: float, max_it
             The tolerance of the approximation.
         max_iterations: int
             The maximum number of iterations.
+        log: bool
+            Whether to log the iterations.
 
     Returns:
         x_n: float
@@ -58,8 +61,9 @@ def newtons(f: callable, f_prime: callable, x_0: float, tolerance: float, max_it
 
         this_x_n = x_n[-1]
         last_x_n = x_n[-2]
-        
-        print(n, this_x_n)
+
+        if log:
+            print(n, this_x_n)
 
         x_diff = abs(this_x_n - last_x_n)
         func_diff = abs(f(this_x_n))
