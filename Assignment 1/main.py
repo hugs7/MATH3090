@@ -16,7 +16,6 @@ QUARTLERLY = 4
 EPS = 0.01
 
 
-
 def q1():
     print("Question 1:")
 
@@ -43,7 +42,7 @@ def q1():
 
     display.display_question(q, subquestions[q])
     display.display_answer(price_i)
-    
+
     # Question ii
     q = "ii"
     interest_rate = 0.08
@@ -91,9 +90,9 @@ def q2():
     print("What is the range of x such that P > 0 when r = 5%?")
 
     r = 0.05
-    cash_flow = lambda k, x: -3*x if k == 0 else (5 if k == 1 else x)
+    def cash_flow(k, x): return -3*x if k == 0 else (5 if k == 1 else x)
 
-    accept_condition = lambda p: p > 0
+    def accept_condition(p): return p > 0
 
     # Function to calculate present value based on some value of x
     def present_value(x: float) -> float:
@@ -114,7 +113,7 @@ def q2():
     x_step = 0.01
     accept_min_x = None
     accept_max_x = None
-    
+
     # Loop over a wide range of x
     for x in np.arange(x_min, x_max, x_step):
         cash_flow_x = present_value(x)
@@ -141,16 +140,16 @@ def q2():
         accept_max_x = math.inf
 
     # Visualise cash flow on a graph
-    # plot.plot_dictionary(cash_flows_x, "x", "P", "Present value of cash flow")  
+    # plot.plot_dictionary(cash_flows_x, "x", "P", "Present value of cash flow")
 
-    print(f"Range of x such that P > 0 when r = 5%: {accept_min_x} < x < {accept_max_x}")
-
+    print(
+        f"Range of x such that P > 0 when r = {r * 100}%: {accept_min_x} < x < {accept_max_x}")
 
     # Part b (3 marks)
     print("Part B (3 marks):")
-    print("The IRR (internal rate of return) is r such that P = 0. For what range of x will there be", 
+    print("The IRR (internal rate of return) is r such that P = 0. For what range of x will there be",
           "a unique strictly positive IRR?")
-    
+
     xr_grid = {}
 
     accept_xr = []
@@ -171,19 +170,23 @@ def q2():
 def q3():
     print("Question 3")
     print("In this question, consider a bond with the set of cashflows given in Table 1. Here, note that the face " +
-          "value F is already included in the last cashflow. Let y be the yield to maturity, t_i, be the time of the "+ 
-          "ith cashflow, C_i, and PV = 100 be the market price of the bond at t = 0. Assume continuous compounding. "+ 
+          "value F is already included in the last cashflow. Let y be the yield to maturity, t_i, be the time of the " +
+          "ith cashflow, C_i, and PV = 100 be the market price of the bond at t = 0. Assume continuous compounding. " +
           "Then, y solves PV = \sum_{i=1} C_i e^{-yt_i}.")
-    
+
     # Part a (3 marks)
     print("Part a (3 marks)")
-    print("Write out the Newton iteration to compute y_{n+1} from y_{n}. Specifically, clearly indicate the "+ 
+    print("Write out the Newton iteration to compute y_{n+1} from y_{n}. Specifically, clearly indicate the " +
           "functions f(y) and f'(y)")
-    
+
     cashflows = [2.3, 2.9, 3.0, 3.2, 4.0, 3.8, 4.2, 4.8, 5.5, 105]
-    
-    f = lambda y: sum(cashflows[t] * interest.continuous_compound_interest_discounted(y, t) for t in range(len(cashflows)))
-    f_prime = lambda y: -sum(((t * cashflows[t]) / ((1 + y)**(t + 1))) for t in range(len(cashflows)))
+
+    def f(y): return sum(
+        cashflows[t] * interest.continuous_compound_interest_discounted(y, t) for t in range(len(cashflows)))
+
+    def f_prime(y): return - \
+        sum(((t * cashflows[t]) / ((1 + y)**(t + 1)))
+            for t in range(len(cashflows)))
 
     # Part b (5 marks)
     print("Part b (5 marks)")
@@ -215,7 +218,7 @@ def main():
         q1()
         q2()
         q3()
-    
+
     return 0
 
 
