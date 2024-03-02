@@ -87,7 +87,7 @@ def continuous_compound_interest_discounted(interest_rate: float, maturity_yrs: 
             The discounted ratio of the sum of money.
     """
 
-    beta = math.exp(- interest_rate * maturity_yrs)
+    beta = math.exp(-interest_rate * maturity_yrs)
 
     return beta
 
