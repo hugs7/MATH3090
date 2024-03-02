@@ -1,0 +1,10 @@
+((*- extends 'article.tplx' -*))
+
+% Add your custom LaTeX packages and commands here
+\usepackage{mathtools}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+
+% Include the notebook content
+((* block docbody *))
+((* super *))
+((* endblock docbody *))
