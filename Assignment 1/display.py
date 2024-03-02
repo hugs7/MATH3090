@@ -7,6 +7,7 @@ from colorama import Fore, Style
 
 BREAK_WIDTH = 100
 
+
 def display_question(question_number: int, question_text: str):
     """
     Display a question.
@@ -23,7 +24,7 @@ def display_question(question_number: int, question_text: str):
     print(question_text)
 
 
-def display_answer(answer_value: float, decimal_places: int = 2):
+def display_answer(answer_value: float, decimal_places: int = 2, dollar_value: bool = True):
     """
     Display an answer.
 
@@ -33,5 +34,5 @@ def display_answer(answer_value: float, decimal_places: int = 2):
     """
 
     print(f"{Fore.GREEN}Answer:{Style.RESET_ALL}", end="")
-    print(f"${round(answer_value, decimal_places)}")
+    print(f'{"$" if dollar_value else ""}{round(answer_value, decimal_places)}')
     print("-"*BREAK_WIDTH)
