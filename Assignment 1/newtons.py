@@ -46,8 +46,6 @@ def newtons_method(f: callable, f_prime: callable, x_0: float, tolerance: float,
             The approximation of the root.
     """
 
-    # Compute the derivative of the function
-
     x_n = [x_0]
 
     md_table_rows = []
