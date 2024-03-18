@@ -24,12 +24,14 @@ def q1():
 
     # Part a (3 marks)
     print("Part A:")
-    print("Suppose a company issues a zero coupon bond with face value $10,000 and which matures in 20 years. Calculate the price given:")
+    print(
+        "Suppose a company issues a zero coupon bond with face value $10,000 and which matures in 20 years. Calculate the price given:"
+    )
 
     subquestions = {
-        "i":   "an 8% discount compound annual yield, compounded annually",
-        "ii":  "an 8% discount continuous annual yield, compounded semi-annually",
-        "iii": "a nonconstant yield of y(t) = 0.06 + 0.2 t * exp(-t^2)"
+        "i": "an 8% discount compound annual yield, compounded annually",
+        "ii": "an 8% discount continuous annual yield, compounded semi-annually",
+        "iii": "a nonconstant yield of y(t) = 0.06 + 0.2 t * exp(-t^2)",
     }
 
     face_value = 10_000
@@ -41,7 +43,8 @@ def q1():
     compounding_frequency_yr = 1
 
     price_i = bond.price_zero_coupon_bond_discrete(
-        face_value, years_to_maturity, interest_rate, compounding_frequency_yr)
+        face_value, years_to_maturity, interest_rate, compounding_frequency_yr
+    )
 
     display.display_question(q, subquestions[q])
     display.display_answer(price_i)
@@ -51,23 +54,29 @@ def q1():
     interest_rate = 0.08
 
     price_ii = bond.price_zero_coupon_bond_continuous(
-        face_value, years_to_maturity, interest_rate)
+        face_value, years_to_maturity, interest_rate
+    )
 
     display.display_question(q, subquestions[q])
     display.display_answer(price_ii)
 
     # Question iii
     q = "iii"
-    def yield_function(t): return 0.06 + 0.2 * t * math.exp(-t**2)
+
+    def yield_function(t):
+        return 0.06 + 0.2 * t * math.exp(-(t**2))
 
     price_iii = bond.price_zero_coupon_bond_nonconstant_yield(
-        face_value, years_to_maturity, yield_function)
+        face_value, years_to_maturity, yield_function
+    )
     display.display_question(q, subquestions[q])
     display.display_answer(price_iii)
 
     # Part b (3 marks)
     print("Part B:")
-    print("A 10 year $10,000 government bond has a coupon rate of 5% payable quarterly and yields 7%. Calculate the price.")
+    print(
+        "A 10 year $10,000 government bond has a coupon rate of 5% payable quarterly and yields 7%. Calculate the price."
+    )
 
     face_value = 10_000
     years_to_maturity = 10
@@ -76,7 +85,12 @@ def q1():
     compounding_frequency_yr = QUARTLERLY
 
     price_b = bond.price_coupon_bearing_bond_discrete(
-        face_value, years_to_maturity, coupon_rate, interest_rate, compounding_frequency_yr)
+        face_value,
+        years_to_maturity,
+        coupon_rate,
+        interest_rate,
+        compounding_frequency_yr,
+    )
 
     display.display_answer(price_b)
 
@@ -93,9 +107,12 @@ def q2():
     print("What is the range of x such that P > 0 when r = 5%?")
 
     r = 0.05
-    def cash_flow(k, x): return -3*x if k == 0 else (5 if k == 1 else x)
 
-    def accept_condition(p): return p > 0
+    def cash_flow(k, x):
+        return -3 * x if k == 0 else (5 if k == 1 else x)
+
+    def accept_condition(p):
+        return p > 0
 
     # Function to calculate present value based on some value of x
     def present_value(x: float) -> float:
@@ -146,12 +163,15 @@ def q2():
     # plot.plot_dictionary(cash_flows_x, "x", "P", "Present value of cash flow")
 
     print(
-        f"Range of x such that P > 0 when r = {r * 100}%: {accept_min_x} < x < {accept_max_x}")
+        f"Range of x such that P > 0 when r = {r * 100}%: {accept_min_x} < x < {accept_max_x}"
+    )
 
     # Part b (3 marks)
     print("Part B (3 marks):")
-    print("The IRR (internal rate of return) is r such that P = 0. For what range of x will there be",
-          "a unique strictly positive IRR?")
+    print(
+        "The IRR (internal rate of return) is r such that P = 0. For what range of x will there be",
+        "a unique strictly positive IRR?",
+    )
 
     xr_grid = {}
 
@@ -172,26 +192,38 @@ def q2():
 
 def q3():
     print("Question 3")
-    print("In this question, consider a bond with the set of cashflows given in Table 1. Here, note that the face " +
-          "value F is already included in the last cashflow. Let y be the yield to maturity, t_i, be the time of the " +
-          "ith cashflow, C_i, and PV = 100 be the market price of the bond at t = 0. Assume continuous compounding. " +
-          "Then, y solves PV = \sum_{i=1} C_i e^{-yt_i}.")
+    print(
+        "In this question, consider a bond with the set of cashflows given in Table 1. Here, note that the face "
+        + "value F is already included in the last cashflow. Let y be the yield to maturity, t_i, be the time of the "
+        + "ith cashflow, C_i, and PV = 100 be the market price of the bond at t = 0. Assume continuous compounding. "
+        + "Then, y solves PV = \sum_{i=1} C_i e^{-yt_i}."
+    )
 
     # Part a (3 marks)
     print("Part a (3 marks)")
-    print("Write out the Newton iteration to compute y_{n+1} from y_{n}. Specifically, clearly indicate the " +
-          "functions f(y) and f'(y)")
+    print(
+        "Write out the Newton iteration to compute y_{n+1} from y_{n}. Specifically, clearly indicate the "
+        + "functions f(y) and f'(y)"
+    )
 
     cashflows = [2.3, 2.9, 3.0, 3.2, 4.0, 3.8, 4.2, 4.8, 5.5, 105]
     # Market price of the bond at t = 0
     PV = 100
 
-    def f(y): return sum(
-        cashflows[t-1] * interest.continuous_compound_interest_discounted(y, t) for t in range(1, len(cashflows)+1)) - PV
+    def f(y):
+        return (
+            sum(
+                cashflows[t - 1]
+                * interest.continuous_compound_interest_discounted(y, t)
+                for t in range(1, len(cashflows) + 1)
+            )
+            - PV
+        )
 
-    def f_prime(y): return - \
-        sum(((t * cashflows[t]) / ((1 + y)**(t + 1)))
-            for t in range(len(cashflows)))
+    def f_prime(y):
+        return -sum(
+            ((t * cashflows[t]) / ((1 + y) ** (t + 1))) for t in range(len(cashflows))
+        )
 
     # Part b (5 marks)
     print("Part b (5 marks)")
@@ -205,7 +237,7 @@ def q3():
 
     # Solve y using Newton's method given f and PV as inputs
 
-    approx, _ = newtons.newtons_method(f, f_prime, x_0, eps, 9999999)
+    approx, _, _ = newtons.newtons_method(f, f_prime, x_0, eps, 9999999)
 
     display.display_answer(approx, 5, False)
 
@@ -215,9 +247,9 @@ def q3():
     y_0_vals = [x for x in np.arange(0.05, 0.25, 0.01)]
     for y_0 in y_0_vals:
         print(
-            f"{Fore.CYAN}y_0 = {Fore.LIGHTRED_EX}{round(y_0, 2)}{Fore.WHITE}", end=": ")
-        approx, _ = newtons.newtons_method(
-            f, f_prime, y_0, eps, 9999999, log=False)
+            f"{Fore.CYAN}y_0 = {Fore.LIGHTRED_EX}{round(y_0, 2)}{Fore.WHITE}", end=": "
+        )
+        approx, _, _ = newtons.newtons_method(f, f_prime, y_0, eps, 9999999, log=False)
         display.display_answer(approx, 10, False)
 
 
@@ -227,16 +259,21 @@ def q4():
 
     print("PV = \sum_{t=1}^{\infty} \frac{D_t}{(1 + k)^t}")
 
-    print("where D_1, D_2,... are (non-random) dividends and k > 0 is the required rate of return.")
+    print(
+        "where D_1, D_2,... are (non-random) dividends and k > 0 is the required rate of return."
+    )
     print("Suppose D_0 > 0, k > 0 and g > 0.")
     print("Derive the formula for the present value (2) when")
 
     print("D_t = D_0 (1 + g)^{\ceil{t/2}}, t = 1, 2, ...")
 
     print(
-        "where \ceil{x} is the ceiling function (i.e. the smallest integer greater than or equal to x).")
+        "where \ceil{x} is the ceiling function (i.e. the smallest integer greater than or equal to x)."
+    )
 
-    print("What is the condition of g so that the PV is finite? To get full marks, you will need to write an explicit expression (without summation).")
+    print(
+        "What is the condition of g so that the PV is finite? To get full marks, you will need to write an explicit expression (without summation)."
+    )
 
 
 def main():

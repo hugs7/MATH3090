@@ -2,7 +2,6 @@
 Helper for dislaying things on the screen
 """
 
-
 from colorama import Fore, Style
 
 
@@ -21,7 +20,9 @@ def display_question(question_number: int, question_text: str):
     print(question_text)
 
 
-def display_answer(answer_value: float, decimal_places: int = 2, dollar_value: bool = True):
+def display_answer(
+    answer_value: float, decimal_places: int = 2, dollar_value: bool = True
+):
     """
     Display an answer.
 
@@ -30,5 +31,5 @@ def display_answer(answer_value: float, decimal_places: int = 2, dollar_value: b
             The value of the answer.
     """
 
-    print(f"{Fore.GREEN}Answer:{Style.RESET_ALL}", end="")
+    print(f"{Fore.GREEN}Answer:{Style.RESET_ALL}", end=" ")
     print(f'{"$" if dollar_value else ""}{round(answer_value, decimal_places)}')
