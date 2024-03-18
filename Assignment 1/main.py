@@ -6,7 +6,7 @@ from typing import Dict
 from colorama import Fore
 import numpy as np
 import sys
-from IPython.display import display, Markdown
+from IPython.display import display
 
 
 import bond
