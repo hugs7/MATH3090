@@ -1,0 +1,955 @@
+\documentclass[11pt]{article}
+
+    \usepackage[breakable]{tcolorbox}
+    \usepackage{parskip} % Stop auto-indenting (to mimic markdown behaviour)
+    
+
+    % Basic figure setup, for now with no caption control since it's done
+    % automatically by Pandoc (which extracts ![](path) syntax from Markdown).
+    \usepackage{graphicx}
+    % Keep aspect ratio if custom image width or height is specified
+    \setkeys{Gin}{keepaspectratio}
+    % Maintain compatibility with old templates. Remove in nbconvert 6.0
+    \let\Oldincludegraphics\includegraphics
+    % Ensure that by default, figures have no caption (until we provide a
+    % proper Figure object with a Caption API and a way to capture that
+    % in the conversion process - todo).
+    \usepackage{caption}
+    \DeclareCaptionFormat{nocaption}{}
+    \captionsetup{format=nocaption,aboveskip=0pt,belowskip=0pt}
+
+    \usepackage{float}
+    \floatplacement{figure}{H} % forces figures to be placed at the correct location
+    \usepackage{xcolor} % Allow colors to be defined
+    \usepackage{enumerate} % Needed for markdown enumerations to work
+    \usepackage{geometry} % Used to adjust the document margins
+    \usepackage{amsmath} % Equations
+    \usepackage{amssymb} % Equations
+    \usepackage{textcomp} % defines textquotesingle
+    % Hack from http://tex.stackexchange.com/a/47451/13684:
+    \AtBeginDocument{%
+        \def\PYZsq{\textquotesingle}% Upright quotes in Pygmentized code
+    }
+    \usepackage{upquote} % Upright quotes for verbatim code
+    \usepackage{eurosym} % defines \euro
+
+    \usepackage{iftex}
+    \ifPDFTeX
+        \usepackage[T1]{fontenc}
+        \IfFileExists{alphabeta.sty}{
+              \usepackage{alphabeta}
+          }{
+              \usepackage[mathletters]{ucs}
+              \usepackage[utf8x]{inputenc}
+          }
+    \else
+        \usepackage{fontspec}
+        \usepackage{unicode-math}
+    \fi
+
+    \usepackage{fancyvrb} % verbatim replacement that allows latex
+    \usepackage{grffile} % extends the file name processing of package graphics
+                         % to support a larger range
+    \makeatletter % fix for old versions of grffile with XeLaTeX
+    \@ifpackagelater{grffile}{2019/11/01}
+    {
+      % Do nothing on new versions
+    }
+    {
+      \def\Gread@@xetex#1{%
+        \IfFileExists{"\Gin@base".bb}%
+        {\Gread@eps{\Gin@base.bb}}%
+        {\Gread@@xetex@aux#1}%
+      }
+    }
+    \makeatother
+    \usepackage[Export]{adjustbox} % Used to constrain images to a maximum size
+    \adjustboxset{max size={0.9\linewidth}{0.9\paperheight}}
+
+    % The hyperref package gives us a pdf with properly built
+    % internal navigation ('pdf bookmarks' for the table of contents,
+    % internal cross-reference links, web links for URLs, etc.)
+    \usepackage{hyperref}
+    % The default LaTeX title has an obnoxious amount of whitespace. By default,
+    % titling removes some of it. It also provides customization options.
+    \usepackage{titling}
+    \usepackage{longtable} % longtable support required by pandoc >1.10
+    \usepackage{booktabs}  % table support for pandoc > 1.12.2
+    \usepackage{array}     % table support for pandoc >= 2.11.3
+    \usepackage{calc}      % table minipage width calculation for pandoc >= 2.11.1
+    \usepackage[inline]{enumitem} % IRkernel/repr support (it uses the enumerate* environment)
+    \usepackage[normalem]{ulem} % ulem is needed to support strikethroughs (\sout)
+                                % normalem makes italics be italics, not underlines
+    \usepackage{soul}      % strikethrough (\st) support for pandoc >= 3.0.0
+    \usepackage{mathrsfs}
+    
+
+    
+    % Colors for the hyperref package
+    \definecolor{urlcolor}{rgb}{0,.145,.698}
+    \definecolor{linkcolor}{rgb}{.71,0.21,0.01}
+    \definecolor{citecolor}{rgb}{.12,.54,.11}
+
+    % ANSI colors
+    \definecolor{ansi-black}{HTML}{3E424D}
+    \definecolor{ansi-black-intense}{HTML}{282C36}
+    \definecolor{ansi-red}{HTML}{E75C58}
+    \definecolor{ansi-red-intense}{HTML}{B22B31}
+    \definecolor{ansi-green}{HTML}{00A250}
+    \definecolor{ansi-green-intense}{HTML}{007427}
+    \definecolor{ansi-yellow}{HTML}{DDB62B}
+    \definecolor{ansi-yellow-intense}{HTML}{B27D12}
+    \definecolor{ansi-blue}{HTML}{208FFB}
+    \definecolor{ansi-blue-intense}{HTML}{0065CA}
+    \definecolor{ansi-magenta}{HTML}{D160C4}
+    \definecolor{ansi-magenta-intense}{HTML}{A03196}
+    \definecolor{ansi-cyan}{HTML}{60C6C8}
+    \definecolor{ansi-cyan-intense}{HTML}{258F8F}
+    \definecolor{ansi-white}{HTML}{C5C1B4}
+    \definecolor{ansi-white-intense}{HTML}{A1A6B2}
+    \definecolor{ansi-default-inverse-fg}{HTML}{FFFFFF}
+    \definecolor{ansi-default-inverse-bg}{HTML}{000000}
+
+    % common color for the border for error outputs.
+    \definecolor{outerrorbackground}{HTML}{FFDFDF}
+
+    % commands and environments needed by pandoc snippets
+    % extracted from the output of `pandoc -s`
+    \providecommand{\tightlist}{%
+      \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+    \DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+    % Add ',fontsize=\small' for more characters per line
+    \newenvironment{Shaded}{}{}
+    \newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
+    \newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.56,0.13,0.00}{{#1}}}
+    \newcommand{\DecValTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\FloatTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\CharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\StringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\CommentTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textit{{#1}}}}
+    \newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{{#1}}}
+    \newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+    \newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.02,0.16,0.49}{{#1}}}
+    \newcommand{\RegionMarkerTok}[1]{{#1}}
+    \newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+    \newcommand{\NormalTok}[1]{{#1}}
+
+    % Additional commands for more recent versions of Pandoc
+    \newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.53,0.00,0.00}{{#1}}}
+    \newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.73,0.40,0.53}{{#1}}}
+    \newcommand{\ImportTok}[1]{{#1}}
+    \newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.73,0.13,0.13}{\textit{{#1}}}}
+    \newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\VariableTok}[1]{\textcolor[rgb]{0.10,0.09,0.49}{{#1}}}
+    \newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
+    \newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.40,0.40,0.40}{{#1}}}
+    \newcommand{\BuiltInTok}[1]{{#1}}
+    \newcommand{\ExtensionTok}[1]{{#1}}
+    \newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.74,0.48,0.00}{{#1}}}
+    \newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.49,0.56,0.16}{{#1}}}
+    \newcommand{\InformationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+
+
+    % Define a nice break command that doesn't care if a line doesn't already
+    % exist.
+    \def\br{\hspace*{\fill} \\* }
+    % Math Jax compatibility definitions
+    \def\gt{>}
+    \def\lt{<}
+    \let\Oldtex\TeX
+    \let\Oldlatex\LaTeX
+    \renewcommand{\TeX}{\textrm{\Oldtex}}
+    \renewcommand{\LaTeX}{\textrm{\Oldlatex}}
+    % Document parameters
+    % Document title
+    \title{MATH3090 Assignment 1}
+    
+    
+    
+    
+    
+    
+    
+% Pygments definitions
+\makeatletter
+\def\PY@reset{\let\PY@it=\relax \let\PY@bf=\relax%
+    \let\PY@ul=\relax \let\PY@tc=\relax%
+    \let\PY@bc=\relax \let\PY@ff=\relax}
+\def\PY@tok#1{\csname PY@tok@#1\endcsname}
+\def\PY@toks#1+{\ifx\relax#1\empty\else%
+    \PY@tok{#1}\expandafter\PY@toks\fi}
+\def\PY@do#1{\PY@bc{\PY@tc{\PY@ul{%
+    \PY@it{\PY@bf{\PY@ff{#1}}}}}}}
+\def\PY#1#2{\PY@reset\PY@toks#1+\relax+\PY@do{#2}}
+
+\@namedef{PY@tok@w}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.73,0.73}{##1}}}
+\@namedef{PY@tok@c}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cp}{\def\PY@tc##1{\textcolor[rgb]{0.61,0.40,0.00}{##1}}}
+\@namedef{PY@tok@k}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kp}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kt}{\def\PY@tc##1{\textcolor[rgb]{0.69,0.00,0.25}{##1}}}
+\@namedef{PY@tok@o}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@ow}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\@namedef{PY@tok@nb}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@nf}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@nc}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@nn}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@ne}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.80,0.25,0.22}{##1}}}
+\@namedef{PY@tok@nv}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@no}{\def\PY@tc##1{\textcolor[rgb]{0.53,0.00,0.00}{##1}}}
+\@namedef{PY@tok@nl}{\def\PY@tc##1{\textcolor[rgb]{0.46,0.46,0.00}{##1}}}
+\@namedef{PY@tok@ni}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.44,0.44,0.44}{##1}}}
+\@namedef{PY@tok@na}{\def\PY@tc##1{\textcolor[rgb]{0.41,0.47,0.13}{##1}}}
+\@namedef{PY@tok@nt}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@nd}{\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\@namedef{PY@tok@s}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sd}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@si}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.64,0.35,0.47}{##1}}}
+\@namedef{PY@tok@se}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.67,0.36,0.12}{##1}}}
+\@namedef{PY@tok@sr}{\def\PY@tc##1{\textcolor[rgb]{0.64,0.35,0.47}{##1}}}
+\@namedef{PY@tok@ss}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@sx}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@m}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@gh}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\@namedef{PY@tok@gu}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.50,0.00,0.50}{##1}}}
+\@namedef{PY@tok@gd}{\def\PY@tc##1{\textcolor[rgb]{0.63,0.00,0.00}{##1}}}
+\@namedef{PY@tok@gi}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.52,0.00}{##1}}}
+\@namedef{PY@tok@gr}{\def\PY@tc##1{\textcolor[rgb]{0.89,0.00,0.00}{##1}}}
+\@namedef{PY@tok@ge}{\let\PY@it=\textit}
+\@namedef{PY@tok@gs}{\let\PY@bf=\textbf}
+\@namedef{PY@tok@ges}{\let\PY@bf=\textbf\let\PY@it=\textit}
+\@namedef{PY@tok@gp}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\@namedef{PY@tok@go}{\def\PY@tc##1{\textcolor[rgb]{0.44,0.44,0.44}{##1}}}
+\@namedef{PY@tok@gt}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.27,0.87}{##1}}}
+\@namedef{PY@tok@err}{\def\PY@bc##1{{\setlength{\fboxsep}{\string -\fboxrule}\fcolorbox[rgb]{1.00,0.00,0.00}{1,1,1}{\strut ##1}}}}
+\@namedef{PY@tok@kc}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kd}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kn}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kr}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@bp}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@fm}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@vc}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@vg}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@vi}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@vm}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@sa}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sb}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sc}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@dl}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@s2}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sh}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@s1}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@mb}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mf}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mh}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mi}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@il}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mo}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@ch}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cm}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cpf}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@c1}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cs}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+
+\def\PYZbs{\char`\\}
+\def\PYZus{\char`\_}
+\def\PYZob{\char`\{}
+\def\PYZcb{\char`\}}
+\def\PYZca{\char`\^}
+\def\PYZam{\char`\&}
+\def\PYZlt{\char`\<}
+\def\PYZgt{\char`\>}
+\def\PYZsh{\char`\#}
+\def\PYZpc{\char`\%}
+\def\PYZdl{\char`\$}
+\def\PYZhy{\char`\-}
+\def\PYZsq{\char`\'}
+\def\PYZdq{\char`\"}
+\def\PYZti{\char`\~}
+% for compatibility with earlier versions
+\def\PYZat{@}
+\def\PYZlb{[}
+\def\PYZrb{]}
+\makeatother
+
+
+    % For linebreaks inside Verbatim environment from package fancyvrb.
+    \makeatletter
+        \newbox\Wrappedcontinuationbox
+        \newbox\Wrappedvisiblespacebox
+        \newcommand*\Wrappedvisiblespace {\textcolor{red}{\textvisiblespace}}
+        \newcommand*\Wrappedcontinuationsymbol {\textcolor{red}{\llap{\tiny$\m@th\hookrightarrow$}}}
+        \newcommand*\Wrappedcontinuationindent {3ex }
+        \newcommand*\Wrappedafterbreak {\kern\Wrappedcontinuationindent\copy\Wrappedcontinuationbox}
+        % Take advantage of the already applied Pygments mark-up to insert
+        % potential linebreaks for TeX processing.
+        %        {, <, #, %, $, ' and ": go to next line.
+        %        _, }, ^, &, >, - and ~: stay at end of broken line.
+        % Use of \textquotesingle for straight quote.
+        \newcommand*\Wrappedbreaksatspecials {%
+            \def\PYGZus{\discretionary{\char`\_}{\Wrappedafterbreak}{\char`\_}}%
+            \def\PYGZob{\discretionary{}{\Wrappedafterbreak\char`\{}{\char`\{}}%
+            \def\PYGZcb{\discretionary{\char`\}}{\Wrappedafterbreak}{\char`\}}}%
+            \def\PYGZca{\discretionary{\char`\^}{\Wrappedafterbreak}{\char`\^}}%
+            \def\PYGZam{\discretionary{\char`\&}{\Wrappedafterbreak}{\char`\&}}%
+            \def\PYGZlt{\discretionary{}{\Wrappedafterbreak\char`\<}{\char`\<}}%
+            \def\PYGZgt{\discretionary{\char`\>}{\Wrappedafterbreak}{\char`\>}}%
+            \def\PYGZsh{\discretionary{}{\Wrappedafterbreak\char`\#}{\char`\#}}%
+            \def\PYGZpc{\discretionary{}{\Wrappedafterbreak\char`\%}{\char`\%}}%
+            \def\PYGZdl{\discretionary{}{\Wrappedafterbreak\char`\$}{\char`\$}}%
+            \def\PYGZhy{\discretionary{\char`\-}{\Wrappedafterbreak}{\char`\-}}%
+            \def\PYGZsq{\discretionary{}{\Wrappedafterbreak\textquotesingle}{\textquotesingle}}%
+            \def\PYGZdq{\discretionary{}{\Wrappedafterbreak\char`\"}{\char`\"}}%
+            \def\PYGZti{\discretionary{\char`\~}{\Wrappedafterbreak}{\char`\~}}%
+        }
+        % Some characters . , ; ? ! / are not pygmentized.
+        % This macro makes them "active" and they will insert potential linebreaks
+        \newcommand*\Wrappedbreaksatpunct {%
+            \lccode`\~`\.\lowercase{\def~}{\discretionary{\hbox{\char`\.}}{\Wrappedafterbreak}{\hbox{\char`\.}}}%
+            \lccode`\~`\,\lowercase{\def~}{\discretionary{\hbox{\char`\,}}{\Wrappedafterbreak}{\hbox{\char`\,}}}%
+            \lccode`\~`\;\lowercase{\def~}{\discretionary{\hbox{\char`\;}}{\Wrappedafterbreak}{\hbox{\char`\;}}}%
+            \lccode`\~`\:\lowercase{\def~}{\discretionary{\hbox{\char`\:}}{\Wrappedafterbreak}{\hbox{\char`\:}}}%
+            \lccode`\~`\?\lowercase{\def~}{\discretionary{\hbox{\char`\?}}{\Wrappedafterbreak}{\hbox{\char`\?}}}%
+            \lccode`\~`\!\lowercase{\def~}{\discretionary{\hbox{\char`\!}}{\Wrappedafterbreak}{\hbox{\char`\!}}}%
+            \lccode`\~`\/\lowercase{\def~}{\discretionary{\hbox{\char`\/}}{\Wrappedafterbreak}{\hbox{\char`\/}}}%
+            \catcode`\.\active
+            \catcode`\,\active
+            \catcode`\;\active
+            \catcode`\:\active
+            \catcode`\?\active
+            \catcode`\!\active
+            \catcode`\/\active
+            \lccode`\~`\~
+        }
+    \makeatother
+
+    \let\OriginalVerbatim=\Verbatim
+    \makeatletter
+    \renewcommand{\Verbatim}[1][1]{%
+        %\parskip\z@skip
+        \sbox\Wrappedcontinuationbox {\Wrappedcontinuationsymbol}%
+        \sbox\Wrappedvisiblespacebox {\FV@SetupFont\Wrappedvisiblespace}%
+        \def\FancyVerbFormatLine ##1{\hsize\linewidth
+            \vtop{\raggedright\hyphenpenalty\z@\exhyphenpenalty\z@
+                \doublehyphendemerits\z@\finalhyphendemerits\z@
+                \strut ##1\strut}%
+        }%
+        % If the linebreak is at a space, the latter will be displayed as visible
+        % space at end of first line, and a continuation symbol starts next line.
+        % Stretch/shrink are however usually zero for typewriter font.
+        \def\FV@Space {%
+            \nobreak\hskip\z@ plus\fontdimen3\font minus\fontdimen4\font
+            \discretionary{\copy\Wrappedvisiblespacebox}{\Wrappedafterbreak}
+            {\kern\fontdimen2\font}%
+        }%
+
+        % Allow breaks at special characters using \PYG... macros.
+        \Wrappedbreaksatspecials
+        % Breaks at punctuation characters . , ; ? ! and / need catcode=\active
+        \OriginalVerbatim[#1,codes*=\Wrappedbreaksatpunct]%
+    }
+    \makeatother
+
+    % Exact colors from NB
+    \definecolor{incolor}{HTML}{303F9F}
+    \definecolor{outcolor}{HTML}{D84315}
+    \definecolor{cellborder}{HTML}{CFCFCF}
+    \definecolor{cellbackground}{HTML}{F7F7F7}
+
+    % prompt
+    \makeatletter
+    \newcommand{\boxspacing}{\kern\kvtcb@left@rule\kern\kvtcb@boxsep}
+    \makeatother
+    \newcommand{\prompt}[4]{
+        {\ttfamily\llap{{\color{#2}[#3]:\hspace{3pt}#4}}\vspace{-\baselineskip}}
+    }
+    
+
+    
+    % Prevent overflowing lines due to hard-to-break entities
+    \sloppy
+    % Setup hyperref package
+    \hypersetup{
+      breaklinks=true,  % so long urls are correctly broken across lines
+      colorlinks=true,
+      urlcolor=urlcolor,
+      linkcolor=linkcolor,
+      citecolor=citecolor,
+      }
+    % Slightly bigger margins than the latex defaults
+    
+    \geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+    
+    
+
+\begin{document}
+    
+    \maketitle
+    
+    
+
+    
+    \section{MATH3090 Assignment 1}\label{math3090-assignment-1}
+
+Student: Hugo Burton (s4698512) Date Due: Tuesday March 19 @ 1pm
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{1}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{import} \PY{n+nn}{math}
+\PY{k+kn}{from} \PY{n+nn}{typing} \PY{k+kn}{import} \PY{n}{Dict}
+\PY{k+kn}{from} \PY{n+nn}{colorama} \PY{k+kn}{import} \PY{n}{Fore}\PY{p}{,} \PY{n}{Style}
+\PY{k+kn}{import} \PY{n+nn}{numpy} \PY{k}{as} \PY{n+nn}{np}
+\PY{k+kn}{from} \PY{n+nn}{IPython}\PY{n+nn}{.}\PY{n+nn}{display} \PY{k+kn}{import} \PY{n}{Markdown}\PY{p}{,} \PY{n}{display}
+
+\PY{k+kn}{import} \PY{n+nn}{bond}
+\PY{k+kn}{import} \PY{n+nn}{interest}
+\PY{k+kn}{import} \PY{n+nn}{newtons}
+\PY{k+kn}{import} \PY{n+nn}{display} \PY{k}{as} \PY{n+nn}{dsp}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \subsection{Question 1 (6 marks)}\label{question-1-6-marks}
+
+\subsubsection{Part A (3 marks)}\label{part-a-3-marks}
+
+Suppose a company issues a zero coupon bond with face value \$10,000 and
+which matures in 20 years. Calculate the price given:
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{2}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{face\PYZus{}value} \PY{o}{=} \PY{l+m+mi}{10\PYZus{}000}
+\PY{n}{years\PYZus{}to\PYZus{}maturity} \PY{o}{=} \PY{l+m+mi}{20}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{enumerate}
+\def\labelenumi{\roman{enumi}.}
+\tightlist
+\item
+  An 8\% discount compound annual yield, compounded annually.
+\end{enumerate}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{3}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{c+c1}{\PYZsh{} Question i}
+\PY{n}{interest\PYZus{}rate} \PY{o}{=} \PY{l+m+mf}{0.08}
+\PY{n}{compounding\PYZus{}frequency\PYZus{}yr} \PY{o}{=} \PY{l+m+mi}{1}
+
+\PY{n}{price\PYZus{}i} \PY{o}{=} \PY{n}{bond}\PY{o}{.}\PY{n}{price\PYZus{}zero\PYZus{}coupon\PYZus{}bond\PYZus{}discrete}\PY{p}{(}
+    \PY{n}{face\PYZus{}value}\PY{p}{,} \PY{n}{years\PYZus{}to\PYZus{}maturity}\PY{p}{,} \PY{n}{interest\PYZus{}rate}\PY{p}{,} \PY{n}{compounding\PYZus{}frequency\PYZus{}yr}\PY{p}{)}
+
+\PY{n}{dsp}\PY{o}{.}\PY{n}{display\PYZus{}answer}\PY{p}{(}\PY{n}{price\PYZus{}i}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+\textcolor{ansi-green}{Answer:} \$2145.48
+    \end{Verbatim}
+
+    \begin{enumerate}
+\def\labelenumi{\roman{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  An 8\% discount continuous annual yield, compounded semi-annually.
+\end{enumerate}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{4}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{c+c1}{\PYZsh{} Question ii}
+\PY{n}{interest\PYZus{}rate} \PY{o}{=} \PY{l+m+mf}{0.08}
+
+\PY{n}{price\PYZus{}ii} \PY{o}{=} \PY{n}{bond}\PY{o}{.}\PY{n}{price\PYZus{}zero\PYZus{}coupon\PYZus{}bond\PYZus{}continuous}\PY{p}{(}
+    \PY{n}{face\PYZus{}value}\PY{p}{,} \PY{n}{years\PYZus{}to\PYZus{}maturity}\PY{p}{,} \PY{n}{interest\PYZus{}rate}\PY{p}{)}
+
+\PY{n}{dsp}\PY{o}{.}\PY{n}{display\PYZus{}answer}\PY{p}{(}\PY{n}{price\PYZus{}ii}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+\textcolor{ansi-green}{Answer:} \$2018.97
+    \end{Verbatim}
+
+    \begin{enumerate}
+\def\labelenumi{\roman{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  A nonconstant yield of \(y(t) = 0.06 + 0.2 t e^{-t^2}\).
+\end{enumerate}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{5}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{c+c1}{\PYZsh{} Question iii}
+\PY{n}{q} \PY{o}{=} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{iii}\PY{l+s+s2}{\PYZdq{}}
+\PY{k}{def} \PY{n+nf}{yield\PYZus{}function}\PY{p}{(}\PY{n}{t}\PY{p}{)}\PY{p}{:} \PY{k}{return} \PY{l+m+mf}{0.06} \PY{o}{+} \PY{l+m+mf}{0.2} \PY{o}{*} \PY{n}{t} \PY{o}{*} \PY{n}{math}\PY{o}{.}\PY{n}{exp}\PY{p}{(}\PY{o}{\PYZhy{}}\PY{n}{t}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}\PY{p}{)}
+
+\PY{n}{price\PYZus{}iii} \PY{o}{=} \PY{n}{bond}\PY{o}{.}\PY{n}{price\PYZus{}zero\PYZus{}coupon\PYZus{}bond\PYZus{}nonconstant\PYZus{}yield}\PY{p}{(}
+    \PY{n}{face\PYZus{}value}\PY{p}{,} \PY{n}{years\PYZus{}to\PYZus{}maturity}\PY{p}{,} \PY{n}{yield\PYZus{}function}\PY{p}{)}
+
+\PY{n}{dsp}\PY{o}{.}\PY{n}{display\PYZus{}answer}\PY{p}{(}\PY{n}{price\PYZus{}iii}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+\textcolor{ansi-green}{Answer:} \$2725.32
+    \end{Verbatim}
+
+    \subsubsection{Part B (3 marks)}\label{part-b-3-marks}
+
+A 10 year \$10,000 government bond has a coupon rate of 5\% payable
+quarterly and yields 7\%. Calculate the price.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{6}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{c+c1}{\PYZsh{} Part b (3 marks)}
+\PY{n}{face\PYZus{}value} \PY{o}{=} \PY{l+m+mi}{10\PYZus{}000}
+\PY{n}{years\PYZus{}to\PYZus{}maturity} \PY{o}{=} \PY{l+m+mi}{10}
+\PY{n}{coupon\PYZus{}rate} \PY{o}{=} \PY{l+m+mf}{0.05}
+\PY{n}{interest\PYZus{}rate} \PY{o}{=} \PY{l+m+mf}{0.07}
+\PY{n}{compounding\PYZus{}frequency\PYZus{}yr} \PY{o}{=} \PY{l+m+mi}{4}
+
+\PY{n}{price\PYZus{}b} \PY{o}{=} \PY{n}{bond}\PY{o}{.}\PY{n}{price\PYZus{}coupon\PYZus{}bearing\PYZus{}bond\PYZus{}discrete}\PY{p}{(}
+    \PY{n}{face\PYZus{}value}\PY{p}{,} \PY{n}{years\PYZus{}to\PYZus{}maturity}\PY{p}{,} \PY{n}{coupon\PYZus{}rate}\PY{p}{,} \PY{n}{interest\PYZus{}rate}\PY{p}{,} \PY{n}{compounding\PYZus{}frequency\PYZus{}yr}\PY{p}{)}
+
+\PY{n}{dsp}\PY{o}{.}\PY{n}{display\PYZus{}answer}\PY{p}{(}\PY{n}{price\PYZus{}b}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+\textcolor{ansi-green}{Answer:} \$8570.29
+    \end{Verbatim}
+
+    \subsection{Question 2 (6 marks)}\label{question-2-6-marks}
+
+Consider the cash flow
+
+\[C_0 = -3x,\hspace{0.5cm} C_1 = 5,\hspace{0.5cm} C_2 = x\]
+
+(at periods 0, 1, 2 respectively) for some \(x > 0\).
+
+    \subsection{Part A (3 marks)}\label{part-a-3-marks}
+
+Apply the discount process \(d(k) = (1 + r)^{-k}\) so that the present
+value is
+
+\[P = \sum_{k=0}^{2} d(k) C_k\]
+
+What is the range of \(x\) such that \(P > 0\) when \(r = 5\%\)?
+
+    \begin{align}
+    0 &< P \\
+    0 &< \sum_{i=0}^{2} d(k) C_k \\
+    0 &< \left[(1 + 0.05)^{-0} \cdot -3x\right] + \left[(1 + 0.05)^{-1} \cdot 5\right] + \left[(1 + 0.05)^{-2} \cdot x\right] \\
+    0 &< \left[1 \cdot -3x\right] + \left[\frac{5}{1 + 0.05}\right] + \left[\frac{x}{(1 + 0.05)^{2}}\right] \\
+    0 &< -3x + \frac{5}{1.05} + \frac{x}{1.05^{2}} \\
+    0 &< -3 \cdot 1.05^2 x + 5 \cdot 1.05 + x \\
+    0 &< -2.3075 x + 5.25 \\
+    2.3075 x &< 5.25 \\
+    x &< \frac{5.25}{2.3075} \\
+    x &\lessapprox 2.275 \\
+\end{align}
+
+Therefore, when \(r = 5\%\), \(P > 0\) holds when
+\(x \lessapprox 2.275\).
+
+We can verify this in code numerically as follows.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{7}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{r} \PY{o}{=} \PY{l+m+mf}{0.05}
+\PY{n}{cash\PYZus{}flow} \PY{o}{=} \PY{k}{lambda} \PY{n}{k}\PY{p}{,} \PY{n}{x}\PY{p}{:} \PY{o}{\PYZhy{}}\PY{l+m+mi}{3}\PY{o}{*}\PY{n}{x} \PY{k}{if} \PY{n}{k} \PY{o}{==} \PY{l+m+mi}{0} \PY{k}{else} \PY{p}{(}\PY{l+m+mi}{5} \PY{k}{if} \PY{n}{k} \PY{o}{==} \PY{l+m+mi}{1} \PY{k}{else} \PY{n}{x}\PY{p}{)}
+
+\PY{n}{accept\PYZus{}condition} \PY{o}{=} \PY{k}{lambda} \PY{n}{p}\PY{p}{:} \PY{n}{p} \PY{o}{\PYZgt{}} \PY{l+m+mi}{0}
+
+\PY{c+c1}{\PYZsh{} Function to calculate present value based on some value of x}
+\PY{k}{def} \PY{n+nf}{present\PYZus{}value}\PY{p}{(}\PY{n}{x}\PY{p}{:} \PY{n+nb}{float}\PY{p}{)} \PY{o}{\PYZhy{}}\PY{o}{\PYZgt{}} \PY{n+nb}{float}\PY{p}{:}
+    \PY{n}{present\PYZus{}value} \PY{o}{=} \PY{n+nb}{sum}\PY{p}{(}\PY{n}{cash\PYZus{}flow}\PY{p}{(}\PY{n}{k}\PY{p}{,} \PY{n}{x}\PY{p}{)} \PY{o}{*} \PY{n}{interest}\PY{o}{.}\PY{n}{discrete\PYZus{}compound\PYZus{}interest\PYZus{}discounted}\PY{p}{(}\PY{n}{r}\PY{p}{,} \PY{n}{k}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{)} \PYZbs{}
+                        \PY{k}{for} \PY{n}{k} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{2}\PY{o}{+}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{)}
+    
+    \PY{k}{return} \PY{n}{present\PYZus{}value}
+
+\PY{n}{cash\PYZus{}flows\PYZus{}x}\PY{p}{:} \PY{n}{Dict}\PY{p}{[}\PY{n+nb}{float}\PY{p}{,} \PY{n+nb}{float}\PY{p}{]} \PY{o}{=} \PY{p}{\PYZob{}}\PY{p}{\PYZcb{}}
+\PY{n}{x\PYZus{}min} \PY{o}{=} \PY{o}{\PYZhy{}}\PY{l+m+mf}{100.0}
+\PY{n}{x\PYZus{}max} \PY{o}{=} \PY{l+m+mf}{100.0}
+\PY{n}{x\PYZus{}step} \PY{o}{=} \PY{l+m+mf}{0.01}
+\PY{n}{accept\PYZus{}min\PYZus{}x} \PY{o}{=} \PY{l+m+mi}{0}
+\PY{n}{accept\PYZus{}max\PYZus{}x} \PY{o}{=} \PY{k+kc}{None}
+
+\PY{c+c1}{\PYZsh{} Loop over a wide range of x}
+\PY{k}{for} \PY{n}{x} \PY{o+ow}{in} \PY{n}{np}\PY{o}{.}\PY{n}{arange}\PY{p}{(}\PY{n}{x\PYZus{}min}\PY{p}{,} \PY{n}{x\PYZus{}max}\PY{p}{,} \PY{n}{x\PYZus{}step}\PY{p}{)}\PY{p}{:}
+    \PY{n}{cash\PYZus{}flow\PYZus{}x} \PY{o}{=} \PY{n}{present\PYZus{}value}\PY{p}{(}\PY{n}{x}\PY{p}{)}
+
+    \PY{n}{cash\PYZus{}flows\PYZus{}x}\PY{p}{[}\PY{n}{x}\PY{p}{]} \PY{o}{=} \PY{n}{cash\PYZus{}flow\PYZus{}x}
+
+    \PY{k}{if} \PY{n}{accept\PYZus{}condition}\PY{p}{(}\PY{n}{cash\PYZus{}flow\PYZus{}x}\PY{p}{)}\PY{p}{:}
+        \PY{c+c1}{\PYZsh{} Min}
+        \PY{k}{if} \PY{o+ow}{not} \PY{n}{accept\PYZus{}min\PYZus{}x}\PY{p}{:}
+            \PY{n}{accept\PYZus{}min\PYZus{}x} \PY{o}{=} \PY{n}{x}
+        \PY{k}{elif} \PY{n}{x} \PY{o}{\PYZlt{}} \PY{n}{accept\PYZus{}min\PYZus{}x}\PY{p}{:}
+            \PY{n}{accept\PYZus{}min\PYZus{}x} \PY{o}{=} \PY{n}{x}
+
+        \PY{c+c1}{\PYZsh{} Max}
+        \PY{k}{if} \PY{o+ow}{not} \PY{n}{accept\PYZus{}max\PYZus{}x}\PY{p}{:}
+            \PY{n}{accept\PYZus{}max\PYZus{}x} \PY{o}{=} \PY{n}{x}
+        \PY{k}{elif} \PY{n}{x} \PY{o}{\PYZgt{}} \PY{n}{accept\PYZus{}max\PYZus{}x}\PY{p}{:}
+            \PY{n}{accept\PYZus{}max\PYZus{}x} \PY{o}{=} \PY{n}{x}
+
+\PY{k}{if} \PY{n}{accept\PYZus{}min\PYZus{}x} \PY{o}{==} \PY{n}{x\PYZus{}min}\PY{p}{:}
+    \PY{n}{accept\PYZus{}min\PYZus{}x} \PY{o}{=} \PY{l+m+mi}{0}
+
+\PY{k}{if} \PY{n}{accept\PYZus{}max\PYZus{}x} \PY{o}{==} \PY{n}{x\PYZus{}max}\PY{p}{:}
+    \PY{n}{accept\PYZus{}max\PYZus{}x} \PY{o}{=} \PY{n}{math}\PY{o}{.}\PY{n}{inf}
+
+\PY{n+nb}{print}\PY{p}{(}
+    \PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Range of x such that P \PYZgt{} 0 when r = }\PY{l+s+si}{\PYZob{}}\PY{n}{r}\PY{+w}{ }\PY{o}{*}\PY{+w}{ }\PY{l+m+mi}{100}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZpc{}: }\PY{l+s+si}{\PYZob{}}\PY{n}{accept\PYZus{}min\PYZus{}x}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{ \PYZlt{} x \PYZlt{} }\PY{l+s+si}{\PYZob{}}\PY{n}{accept\PYZus{}max\PYZus{}x}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+Range of x such that P > 0 when r = 5.0\%: 0 < x < 2.2700000000523204
+    \end{Verbatim}
+
+    \subsection{Part B (3 marks)}\label{part-b-3-marks}
+
+The IRR (internal rate of return) is \(r\) such that \(P = 0\). For what
+range of \(x\) will there be a unique, strictly positive IRR?
+
+    \begin{align}
+    P &= \sum_{k=0}^{2} d(k) \cdot C_k \\
+    0 &= \left[d(0) \cdot -3x\right] + \left[d(1) \cdot 5\right] + \left[d(2) \cdot x\right] \\
+    &= -3x (1 + r)^{-0} + 5 (1 + r)^{-1} + x (1 + r)^{-2} \\
+    &= -3x \cdot 1 + \frac{5}{1 + r} + \frac{x}{(1 + r)^2} \\
+    &= -3x (1 + r)^2 + 5 (1 + r) + x \\
+    &= -3x (1^2 + 2r + r^2) + 5 + 5r + x \\
+    &= -3x - 6xr - 3xr^2 + 5 + 5r + x \\
+    &= -3xr^2 + (5 - 6x)r + (x - 3x + 5) \\
+    &= -3xr^2 + (5 - 6x)r + (5 - 2x)
+\end{align}
+
+As we want \(r > 0\), then solve for \(\Delta > 0\)
+
+\begin{align}
+    0 &< \Delta \\
+    0 &< (5 - 6x)^2 - 4 \cdot (-3x) \cdot (5 - 2x) \\
+    0 &< (25 - 60x + 36x^2) + 12x \cdot (5 - 2x) \\
+    0 &< 36x^2 - 60x + 25 + 60x - 24x^2 \\
+    0 &< 12x^2 + 25
+\end{align}
+
+This will always hold \(\forall x \in \mathbb{R}^+\)
+
+Therefore, if \(x > 0\), then IRR \(= \left\{r | P = 0\right\} > 0\).
+
+    \subsection{Question 3 (8 marks)}\label{question-3-8-marks}
+
+\begin{longtable}[]{@{}cc@{}}
+\toprule\noalign{}
+Cashflows (\(C_i\)) & Times (\(t_i\)) \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+2.3 & 1.0 \\
+2.9 & 2.0 \\
+3.0 & 3.0 \\
+3.2 & 4.0 \\
+4.0 & 5.0 \\
+3.8 & 6.0 \\
+4.2 & 7.0 \\
+4.8 & 8.0 \\
+5.5 & 9.0 \\
+105 & 10.0 \\
+\end{longtable}
+
+Table 1: Bond Cashflows
+
+In this question, consider a bond with a set of cashflows given in Table
+1. Here, note that the face value \(F\) is already included in the last
+cashflow. Let \(y\) be the yield to maturity, \(t_i\) be the time of the
+\(i^{\text{th}}\) cashflow \(C_i\), and \(PV = 100\) be the market price
+of the bond at \(t = 0\). Assume continuous compounding. Then \(y\)
+solves
+
+\[PV = \sum_{i} C_i e^{-y t_i}\]
+
+    \subsection{Part A (3 marks)}\label{part-a-3-marks}
+
+Write out the Newton iteration to compute \(y_{n+1}\) from \(y_n\) (see
+L2.49). Specifically, clearly indicate the functions \(f(y)\) and
+\(f'(y)\).
+
+    In this question
+
+\[f(y) = \left[\sum_{t=1}^{10} C_t \cdot \beta(y, t)\right] - P = \left[\sum_{t=1}^{10}C_t \exp\left\{-y \cdot t\right\}\right] - P\]
+
+and
+
+\[f'(y) = \sum_{t=1}^{10} C_t \cdot \beta'(y, t) = \sum_{t=1}^{10} C_t \cdot \frac{d}{dx}\exp\left\{-y \cdot t\right\} = - \sum_{t=1}^{10}t C_t \exp\left\{-y \cdot t\right\}\]
+
+Using these definitions, perform the following
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Choose an intial value of \(x_0\), say \(x_0 = 0.05\)
+\item
+  Compute the following until the termination condition
+\end{enumerate}
+
+\begin{align}
+    x_{n+1} &\approx x_n - \frac{f(x_n)}{f'(x_n)} \\
+    &\approx x_n + \frac{\left[\sum_{t=1}^{10}C_t \exp\left\{-x_n \cdot t\right\}\right] - P}{- \sum_{t=1}^{10}t C_t \exp\left\{-x_n \cdot t\right\}}
+\end{align}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  Terminate when \(|x_{n+1} - x_{n}| < \epsilon\) or
+  \(|f(x_{n+1})| < \epsilon\)
+\end{enumerate}
+
+    \subsection{Part B (5 marks)}\label{part-b-5-marks}
+
+Implement the above Newton iteration in Matlab (I'm using Python) using
+the stopping criteria
+
+\[|y_{n+1} - y_n| < 10^{-8}.\]
+
+Fill in Table 2 for \(y_0 = 0.05\) (add rows as necessary).
+
+In addition, try with larger values for \(y_0\) and observe the accuracy
+and convergence speed. How does the performance change?
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{8}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{c+c1}{\PYZsh{} Part b (5 marks)}
+\PY{n}{cashflows} \PY{o}{=} \PY{p}{[}\PY{l+m+mf}{2.3}\PY{p}{,} \PY{l+m+mf}{2.9}\PY{p}{,} \PY{l+m+mf}{3.0}\PY{p}{,} \PY{l+m+mf}{3.2}\PY{p}{,} \PY{l+m+mf}{4.0}\PY{p}{,} \PY{l+m+mf}{3.8}\PY{p}{,} \PY{l+m+mf}{4.2}\PY{p}{,} \PY{l+m+mf}{4.8}\PY{p}{,} \PY{l+m+mf}{5.5}\PY{p}{,} \PY{l+m+mi}{105}\PY{p}{]}
+
+\PY{c+c1}{\PYZsh{} Market price of the bond at t = 0}
+\PY{n}{PV} \PY{o}{=} \PY{l+m+mi}{100}
+
+\PY{k}{def} \PY{n+nf}{f}\PY{p}{(}\PY{n}{y}\PY{p}{)}\PY{p}{:} \PY{k}{return} \PY{n+nb}{sum}\PY{p}{(}
+    \PY{n}{cashflows}\PY{p}{[}\PY{n}{t}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{]} \PY{o}{*} \PY{n}{interest}\PY{o}{.}\PY{n}{continuous\PYZus{}compound\PYZus{}interest\PYZus{}discounted}\PY{p}{(}\PY{n}{y}\PY{p}{,} \PY{n}{t}\PY{p}{)} \PY{k}{for} \PY{n}{t} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{1}\PY{p}{,} \PY{n+nb}{len}\PY{p}{(}\PY{n}{cashflows}\PY{p}{)}\PY{o}{+}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{)} \PY{o}{\PYZhy{}} \PY{n}{PV}
+
+\PY{k}{def} \PY{n+nf}{f\PYZus{}prime}\PY{p}{(}\PY{n}{y}\PY{p}{)}\PY{p}{:} \PY{k}{return} \PY{o}{\PYZhy{}} \PYZbs{}
+    \PY{n+nb}{sum}\PY{p}{(}\PY{p}{(}\PY{p}{(}\PY{n}{t} \PY{o}{*} \PY{n}{cashflows}\PY{p}{[}\PY{n}{t}\PY{p}{]}\PY{p}{)} \PY{o}{/} \PY{p}{(}\PY{p}{(}\PY{l+m+mi}{1} \PY{o}{+} \PY{n}{y}\PY{p}{)}\PY{o}{*}\PY{o}{*}\PY{p}{(}\PY{n}{t} \PY{o}{+} \PY{l+m+mi}{1}\PY{p}{)}\PY{p}{)}\PY{p}{)}
+        \PY{k}{for} \PY{n}{t} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{n+nb}{len}\PY{p}{(}\PY{n}{cashflows}\PY{p}{)}\PY{p}{)}\PY{p}{)}
+
+    
+\PY{n}{eps} \PY{o}{=} \PY{l+m+mf}{1e\PYZhy{}8}
+
+\PY{c+c1}{\PYZsh{} Set initial y value}
+\PY{n}{x\PYZus{}0} \PY{o}{=} \PY{l+m+mf}{0.05}
+
+\PY{c+c1}{\PYZsh{} Print table header}
+\PY{n}{col\PYZus{}heads} \PY{o}{=} \PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{\PYZdl{}\PYZdl{}n\PYZdl{}\PYZdl{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{\PYZdl{}\PYZdl{}y\PYZus{}n\PYZdl{}\PYZdl{}}\PY{l+s+s2}{\PYZdq{}} \PY{p}{,} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{\PYZdl{}\PYZdl{}|y\PYZus{}}\PY{l+s+si}{\PYZob{}n\PYZcb{}}\PY{l+s+s2}{\PYZhy{}y\PYZus{}}\PY{l+s+s2}{\PYZob{}}\PY{l+s+s2}{n\PYZhy{}1\PYZcb{}|\PYZdl{}\PYZdl{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}
+\PY{n}{col\PYZus{}spaces} \PY{o}{=} \PY{p}{[}\PY{l+m+mi}{3}\PY{p}{,} \PY{l+m+mi}{11}\PY{p}{,} \PY{l+m+mi}{17}\PY{p}{]}
+
+\PY{n}{md\PYZus{}table} \PY{o}{=} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{\PYZdq{}}
+\PY{n}{header\PYZus{}row} \PY{o}{=} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{\PYZdq{}}
+\PY{n}{format\PYZus{}row} \PY{o}{=} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{\PYZdq{}}
+
+\PY{k}{for} \PY{n}{i}\PY{p}{,} \PY{n}{col\PYZus{}head} \PY{o+ow}{in} \PY{n+nb}{enumerate}\PY{p}{(}\PY{n}{col\PYZus{}heads}\PY{p}{)}\PY{p}{:}
+    \PY{n}{space} \PY{o}{=} \PY{n}{col\PYZus{}spaces}\PY{p}{[}\PY{n}{i}\PY{p}{]}
+    \PY{n}{part} \PY{o}{=} \PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{|}\PY{l+s+si}{\PYZob{}}\PY{n}{col\PYZus{}head}\PY{l+s+si}{:}\PY{l+s+s2}{\PYZca{}}\PY{l+s+si}{\PYZob{}}\PY{n}{space}\PY{l+s+si}{\PYZcb{}}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}
+    \PY{n}{header\PYZus{}row} \PY{o}{+}\PY{o}{=} \PY{n}{part}
+    \PY{n}{middle} \PY{o}{=} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZhy{}}\PY{l+s+s1}{\PYZsq{}}\PY{o}{*}\PY{p}{(}\PY{n+nb}{max}\PY{p}{(}\PY{l+m+mi}{1}\PY{p}{,} \PY{n+nb}{len}\PY{p}{(}\PY{n}{part}\PY{p}{)} \PY{o}{\PYZhy{}} \PY{l+m+mi}{2} \PY{o}{\PYZhy{}} \PY{l+m+mi}{2}\PY{p}{)}\PY{p}{)}
+    \PY{n}{format\PYZus{}row} \PY{o}{+}\PY{o}{=} \PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{| :}\PY{l+s+si}{\PYZob{}}\PY{n}{middle}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{: }\PY{l+s+s2}{\PYZdq{}}
+
+\PY{n}{header\PYZus{}row} \PY{o}{+}\PY{o}{=} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{|}\PY{l+s+s2}{\PYZdq{}}
+\PY{n}{format\PYZus{}row} \PY{o}{+}\PY{o}{=} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{|}\PY{l+s+s2}{\PYZdq{}}
+
+\PY{c+c1}{\PYZsh{} Solve y using Newton\PYZsq{}s method given f and PV as inputs}
+
+\PY{n}{approx}\PY{p}{,} \PY{n}{table\PYZus{}rows}\PY{p}{,} \PY{n}{\PYZus{}} \PY{o}{=} \PY{n}{newtons}\PY{o}{.}\PY{n}{newtons\PYZus{}method}\PY{p}{(}\PY{n}{f}\PY{p}{,} \PY{n}{f\PYZus{}prime}\PY{p}{,} \PY{n}{x\PYZus{}0}\PY{p}{,} \PY{n}{eps}\PY{p}{,} \PY{l+m+mi}{9999999}\PY{p}{,} \PY{n}{generate\PYZus{}table}\PY{o}{=}\PY{k+kc}{True}\PY{p}{,} \PY{n}{log}\PY{o}{=}\PY{k+kc}{False}\PY{p}{,} 
+                                               \PY{n}{col\PYZus{}spaces}\PY{o}{=}\PY{n}{col\PYZus{}spaces}\PY{p}{,} \PY{n}{precision}\PY{o}{=}\PY{l+m+mi}{10}\PY{p}{)}
+
+\PY{n}{md\PYZus{}table} \PY{o}{+}\PY{o}{=} \PY{n}{header\PYZus{}row} \PY{o}{+} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{  }\PY{l+s+se}{\PYZbs{}n}\PY{l+s+s2}{\PYZdq{}}
+\PY{n}{md\PYZus{}table} \PY{o}{+}\PY{o}{=} \PY{n}{format\PYZus{}row} \PY{o}{+} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{  }\PY{l+s+se}{\PYZbs{}n}\PY{l+s+s2}{\PYZdq{}}
+\PY{n}{md\PYZus{}table} \PY{o}{+}\PY{o}{=} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{  }\PY{l+s+se}{\PYZbs{}n}\PY{l+s+s2}{\PYZdq{}}\PY{o}{.}\PY{n}{join}\PY{p}{(}\PY{n}{table\PYZus{}rows}\PY{p}{)}
+
+\PY{k}{def} \PY{n+nf}{printmd}\PY{p}{(}\PY{n}{string}\PY{p}{)}\PY{p}{:}
+    \PY{n}{display}\PY{p}{(}\PY{n}{Markdown}\PY{p}{(}\PY{n}{string}\PY{p}{)}\PY{p}{)}
+    
+\PY{n}{printmd}\PY{p}{(}\PY{n}{md\PYZus{}table}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{longtable}[]{@{}ccc@{}}
+\toprule\noalign{}
+\(n\) & \(y_n\) & \(|y_{n}-y_{n-1}|\) \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & 0.0345487861 & 0.0154512139 \\
+1 & 0.0372734985 & 0.0027247125 \\
+2 & 0.0369704389 & 0.0003030597 \\
+3 & 0.0370078067 & 3.73678e-05 \\
+4 & 0.0370032489 & 4.5578e-06 \\
+5 & 0.0370038056 & 5.567e-07 \\
+6 & 0.0370037376 & 6.8e-08 \\
+7 & 0.0370037459 & 8.3e-09 \\
+\end{longtable}
+
+    
+    \subsubsection{\texorpdfstring{Part ii: Larger values of
+\(y_0\)}{Part ii: Larger values of y\_0}}\label{part-ii-larger-values-of-y_0}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{11}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{increment} \PY{o}{=} \PY{l+m+mf}{0.01}
+\PY{n}{y\PYZus{}0\PYZus{}vals} \PY{o}{=} \PY{p}{[}\PY{n}{x} \PY{k}{for} \PY{n}{x} \PY{o+ow}{in} \PY{n}{np}\PY{o}{.}\PY{n}{arange}\PY{p}{(}\PY{l+m+mf}{0.05}\PY{p}{,} \PY{l+m+mf}{0.25}\PY{o}{+}\PY{n}{increment}\PY{p}{,} \PY{n}{increment}\PY{p}{)}\PY{p}{]}
+
+\PY{k}{for} \PY{n}{y\PYZus{}0} \PY{o+ow}{in} \PY{n}{y\PYZus{}0\PYZus{}vals}\PY{p}{:}
+    \PY{n+nb}{print}\PY{p}{(}
+        \PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+si}{\PYZob{}}\PY{n}{Fore}\PY{o}{.}\PY{n}{CYAN}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{y\PYZus{}0 = }\PY{l+s+si}{\PYZob{}}\PY{n}{Fore}\PY{o}{.}\PY{n}{LIGHTRED\PYZus{}EX}\PY{l+s+si}{\PYZcb{}}\PY{l+s+si}{\PYZob{}}\PY{n+nb}{round}\PY{p}{(}\PY{n}{y\PYZus{}0}\PY{p}{,}\PY{+w}{ }\PY{l+m+mi}{2}\PY{p}{)}\PY{l+s+si}{\PYZcb{}}\PY{l+s+si}{\PYZob{}}\PY{n}{Style}\PY{o}{.}\PY{n}{RESET\PYZus{}ALL}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{end}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{: }\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+    \PY{n}{approx}\PY{p}{,} \PY{n}{\PYZus{}}\PY{p}{,} \PY{n}{num\PYZus{}iterations} \PY{o}{=} \PY{n}{newtons}\PY{o}{.}\PY{n}{newtons\PYZus{}method}\PY{p}{(}
+        \PY{n}{f}\PY{p}{,} \PY{n}{f\PYZus{}prime}\PY{p}{,} \PY{n}{y\PYZus{}0}\PY{p}{,} \PY{n}{eps}\PY{p}{,} \PY{l+m+mi}{9999999}\PY{p}{,} \PY{n}{generate\PYZus{}table}\PY{o}{=}\PY{k+kc}{False}\PY{p}{,} \PY{n}{log}\PY{o}{=}\PY{k+kc}{False}\PY{p}{)}
+    
+    \PY{n}{ans} \PY{o}{=} \PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{ }\PY{l+s+si}{\PYZob{}}\PY{n}{Fore}\PY{o}{.}\PY{n}{LIGHTGREEN\PYZus{}EX}\PY{l+s+si}{\PYZcb{}}\PY{l+s+si}{\PYZob{}}\PY{n}{approx}\PY{l+s+si}{:}\PY{l+s+s2}{.10f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+si}{\PYZob{}}\PY{n}{Style}\PY{o}{.}\PY{n}{RESET\PYZus{}ALL}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{ in }\PY{l+s+si}{\PYZob{}}\PY{n}{Fore}\PY{o}{.}\PY{n}{LIGHTMAGENTA\PYZus{}EX}\PY{l+s+si}{\PYZcb{}}\PY{l+s+si}{\PYZob{}}\PY{n}{num\PYZus{}iterations}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{ iterations}\PY{l+s+si}{\PYZob{}}\PY{n}{Style}\PY{o}{.}\PY{n}{RESET\PYZus{}ALL}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{.}\PY{l+s+s2}{\PYZdq{}}
+
+    \PY{n+nb}{print}\PY{p}{(}\PY{n}{ans}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+\textcolor{ansi-cyan}{y\_0 = }\textcolor{ansi-red-intense}{0.05}:  \textcolor{ansi-green-intense}{0.0370037459} in \textcolor{ansi-magenta-intense}{7 iterations}.
+\textcolor{ansi-cyan}{y\_0 = }\textcolor{ansi-red-intense}{0.06}:  \textcolor{ansi-green-intense}{0.0370037448} in \textcolor{ansi-magenta-intense}{8 iterations}.
+\textcolor{ansi-cyan}{y\_0 = }\textcolor{ansi-red-intense}{0.07}:  \textcolor{ansi-green-intense}{0.0370037447} in \textcolor{ansi-magenta-intense}{8 iterations}.
+\textcolor{ansi-cyan}{y\_0 = }\textcolor{ansi-red-intense}{0.08}:  \textcolor{ansi-green-intense}{0.0370037447} in \textcolor{ansi-magenta-intense}{8 iterations}.
+\textcolor{ansi-cyan}{y\_0 = }\textcolor{ansi-red-intense}{0.09}:  \textcolor{ansi-green-intense}{0.0370037448} in \textcolor{ansi-magenta-intense}{8 iterations}.
+\textcolor{ansi-cyan}{y\_0 = }\textcolor{ansi-red-intense}{0.1}:  \textcolor{ansi-green-intense}{0.0370037452} in \textcolor{ansi-magenta-intense}{8 iterations}.
+\textcolor{ansi-cyan}{y\_0 = }\textcolor{ansi-red-intense}{0.11}:  \textcolor{ansi-green-intense}{0.0370037459} in \textcolor{ansi-magenta-intense}{8 iterations}.
+\textcolor{ansi-cyan}{y\_0 = }\textcolor{ansi-red-intense}{0.12}:  \textcolor{ansi-green-intense}{0.0370037448} in \textcolor{ansi-magenta-intense}{9 iterations}.
+\textcolor{ansi-cyan}{y\_0 = }\textcolor{ansi-red-intense}{0.13}:  \textcolor{ansi-green-intense}{0.0370037447} in \textcolor{ansi-magenta-intense}{9 iterations}.
+\textcolor{ansi-cyan}{y\_0 = }\textcolor{ansi-red-intense}{0.14}:  \textcolor{ansi-green-intense}{0.0370037447} in \textcolor{ansi-magenta-intense}{9 iterations}.
+\textcolor{ansi-cyan}{y\_0 = }\textcolor{ansi-red-intense}{0.15}:  \textcolor{ansi-green-intense}{0.0370037440} in \textcolor{ansi-magenta-intense}{6 iterations}.
+\textcolor{ansi-cyan}{y\_0 = }\textcolor{ansi-red-intense}{0.16}:  \textcolor{ansi-green-intense}{0.0370037457} in \textcolor{ansi-magenta-intense}{9 iterations}.
+\textcolor{ansi-cyan}{y\_0 = }\textcolor{ansi-red-intense}{0.17}:  \textcolor{ansi-green-intense}{0.0370037447} in \textcolor{ansi-magenta-intense}{10 iterations}.
+\textcolor{ansi-cyan}{y\_0 = }\textcolor{ansi-red-intense}{0.18}:  \textcolor{ansi-green-intense}{0.0370037447} in \textcolor{ansi-magenta-intense}{10 iterations}.
+\textcolor{ansi-cyan}{y\_0 = }\textcolor{ansi-red-intense}{0.19}:  \textcolor{ansi-green-intense}{0.0370037451} in \textcolor{ansi-magenta-intense}{9 iterations}.
+\textcolor{ansi-cyan}{y\_0 = }\textcolor{ansi-red-intense}{0.2}:  \textcolor{ansi-green-intense}{0.0370037448} in \textcolor{ansi-magenta-intense}{11 iterations}.
+\textcolor{ansi-cyan}{y\_0 = }\textcolor{ansi-red-intense}{0.21}:  \textcolor{ansi-green-intense}{0.0370037447} in \textcolor{ansi-magenta-intense}{11 iterations}.
+\textcolor{ansi-cyan}{y\_0 = }\textcolor{ansi-red-intense}{0.22}:  \textcolor{ansi-green-intense}{0.0370037453} in \textcolor{ansi-magenta-intense}{11 iterations}.
+\textcolor{ansi-cyan}{y\_0 = }\textcolor{ansi-red-intense}{0.23}:  \textcolor{ansi-green-intense}{0.0370037447} in \textcolor{ansi-magenta-intense}{12 iterations}.
+\textcolor{ansi-cyan}{y\_0 = }\textcolor{ansi-red-intense}{0.24}:  \textcolor{ansi-green-intense}{0.0370037458} in \textcolor{ansi-magenta-intense}{12 iterations}.
+\textcolor{ansi-cyan}{y\_0 = }\textcolor{ansi-red-intense}{0.25}:  \textcolor{ansi-green-intense}{0.0370037444} in \textcolor{ansi-magenta-intense}{12 iterations}.
+    \end{Verbatim}
+
+    As seen above, as the initial estimate, \(y_0\) is increased beyond
+\(0.05\) (up to \(0.25\)), more iterations of Newton's method are
+required in order to achieve the same level of accuracy. In other words,
+for the same iteration number, a solution starting with a higher \(y_0\)
+has a lower accuracy.
+
+The difference in the time taken to solve is negligable here, however,
+so is not reported.
+
+    \subsection{Question 4}\label{question-4}
+
+In the Constant Growth DDM model, the present value of the share is
+
+\[PV = \sum_{t=1}^{\infty} \frac{D_t}{(1 + k)^t}\]
+
+where \(D_1, D_2, ...\) are (non-random) dividends and \(k > 0\) is the
+required rate of return
+
+Suppose \(D_0 > 0\), \(k > 0\) and \(g > 0\)
+
+Derive the formula for the present value (2) when
+
+\[D_t = D_0 (1 + g)^{\lceil \frac{t}{2} \rceil}, \hspace{0.5cm} t = 1, 2, ...\]
+
+where \(\lceil x \rceil\) is the smallest integer greater than or equal
+to \(x\). What is the condition of \(g\) so that \(PV\) is finite? To
+get full marks, you will need to write an explicit expression (without
+summation).
+
+    First substitute for \(D_t\) as defined in the question and expand to
+see the pattern
+
+\begin{align}
+    PV &= \sum_{t=1}^{\infty} \frac{D_t}{(1 + k)^t} \\
+    &= \sum_{t=1}^{\infty} \frac{D_0 (1 + g)^{\lceil \frac{t}{2} \rceil}}{(1 + k)^t} \\ 
+    &= \left[ D_0 \cdot \frac{(1 + g)^{\lceil \frac{1}{2} \rceil}}{(1 + k)^1} \right] + \left[ D_0 \cdot \frac{(1 + g)^{\lceil \frac{2}{2} \rceil}}{(1 + k)^2} \right] + \left[ D_0 \cdot \frac{(1 + g)^{\lceil \frac{3}{2} \rceil}}{(1 + k)^3} \right] + \left[ D_0 \cdot \frac{(1 + g)^{\lceil \frac{4}{2} \rceil}}{(1 + k)^4} \right] + \cdots \\
+    &= \left[ D_0 \cdot \frac{(1 + g)^{1}}{(1 + k)^1} \right] + \left[ D_0 \cdot \frac{(1 + g)^{1}}{(1 + k)^2} \right] + \left[ D_0 \cdot \frac{(1 + g)^{2}}{(1 + k)^3} \right] + \left[ D_0 \cdot \frac{(1 + g)^{2}}{(1 + k)^4} \right] + \cdots
+\end{align}
+
+Now consider, splitting up the geometric series into sub series where
+
+\begin{itemize}
+\tightlist
+\item
+  the exponent on the numerator is half the exponent on the denominator;
+  and
+\item
+  the above is not the case
+\end{itemize}
+
+We then have
+
+\begin{align}
+    PV &= \left\{ \left[ D_0 \cdot \frac{(1 + g)^{1}}{(1 + k)^2} \right] + \left[ D_0 \cdot \frac{(1 + g)^{2}}{(1 + k)^4} \right] + \cdots \right\} + \left\{ \left[ D_0 \cdot \frac{(1 + g)^{1}}{(1 + k)^1} \right] + \left[ D_0 \cdot \frac{(1 + g)^{2}}{(1 + k)^3} \right] + \cdots \right\} \\
+    &=  D_0 \left\{ \left[ \frac{(1 + g)^{1}}{(1 + k)^2} \right] + \left[ \frac{(1 + g)^{2}}{(1 + k)^4} \right] + \cdots \right\} + D_0 \left\{ \left[ \frac{(1 + g)^{1}}{(1 + k)^1} \right] + \left[ \frac{(1 + g)^{2}}{(1 + k)^3} \right] + \cdots \right\} \\
+    &=  D_0 \left\{ \left[ \frac{(1 + g)^{1}}{(1 + k)^2} \right] + \left[ \frac{(1 + g)^{2}}{(1 + k)^4} \right] + \cdots \right\} + D_0 (1 + k) \left\{ \left[ \frac{(1 + g)^{1}}{(1 + k)^2} \right] + \left[ \frac{(1 + g)^{2}}{(1 + k)^4} \right] + \cdots \right\} \\
+    &= \sum_{t=1}^{\infty} D_0 \left[ \frac{1 + g}{(1 + k)^2} \right]^{t} + \sum_{t=1}^{\infty} D_0 (1 + k) \left[ \frac{1 + g}{(1 + k)^2} \right]^{t} \\
+    &= \sum_{t=1}^{\infty} D_0 \frac{1 + g}{(1 + k)^2} \left[ \frac{1 + g}{(1 + k)^2} \right]^{t-1} + \sum_{t=1}^{\infty} D_0 (1 + k) \frac{1 + g}{(1 + k)^2} \left[ \frac{1 + g}{(1 + k)^2} \right]^{t-1} \\
+    &= \sum_{t=1}^{\infty} D_0 \frac{1 + g}{(1 + k)^2} \left[ \frac{1 + g}{(1 + k)^2} \right]^{t-1} + \sum_{t=1}^{\infty} D_0 \frac{1 + g}{1 + k} \left[ \frac{1 + g}{(1 + k)^2} \right]^{t-1} \\
+\end{align}
+
+These are both valid geometric series. Now apply the infinite geometric
+series formula
+
+\[\sum_{n=1}^{\infty} a r^{n - 1} = S_n =\frac{a}{1-r}\]
+
+\begin{align}
+    PV &= \frac{D_0 \frac{1 + g}{(1 + k)^2}}{1 - \frac{1 + g}{(1 + k)^2}} + \frac{D_0 \frac{1 + g}{1 + k}}{1 - \frac{1 + g}{(1 + k)^2}} \\
+    &= \frac{D_0 \frac{1 + g}{(1 + k)^2} + D_0 \frac{1 + g}{1 + k}}{1 - \frac{1 + g}{(1 + k)^2}} \\
+    &= \frac{D_0 \frac{1 + g}{1 + k} \left[\frac{1}{1 + k} + 1\right]}{1 - \frac{1 + g}{(1 + k)^2}} \\
+\end{align}
+
+    Condition of \(g\) for when \(PV\) is finite.
+
+From the geometric series, \(PV\) will be finite when \(|r| < 1\), where
+\(r = \frac{1 + g}{(1 + k)^2}\). So solve
+
+\begin{align}
+    |r| &< 1 \\
+    \left|\frac{1 + g}{(1 + k)^2} \right| &< 1 \\
+    -(1 + k)^2 < 1 + g &< (1 + k)^2 \\
+    -(1 + 2k + k^2) - 1 < g &< (1 + 2k + k^2) - 1 \\
+    -(2 + 2k + k^2) < g &< k^2 + 2k \\
+    -2 - 2k - k^2 < g &< k(k + 2) \\
+\end{align}
+
+Since \(g > 0\) and \(k > 0\), we do not need to consider the lower
+bound. Thus for \(PV\) to be finite (\(PV < \infty\)), the following
+condition must hold
+
+\[g < k(k + 2)\]
+
+
+    % Add a bibliography block to the postdoc
+    
+    
+    
+\end{document}
