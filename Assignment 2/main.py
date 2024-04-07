@@ -21,6 +21,12 @@ def main():
 
     print("The bond duration is: ", bond_duration)
 
+    # Bond value at |D|
+
+    val_at_d = bond.bond_value_at_time(bond_duration, F, T, y, n)
+
+    print("The bond value at |D| is: ", val_at_d)
+
 
 if __name__ == "__main__":
     main()
