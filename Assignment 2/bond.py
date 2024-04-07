@@ -308,3 +308,70 @@ def bond_duration_discrete(face_value: int, years_to_maturity: int, coupon_rate:
         duration += ((year * present_value_t) / B)
 
     return duration
+
+
+def bond_value_at_time(bond_duration: float, face_value: int, years_to_maturity: int, interest_rate: float, compounding_frequency_yr: int) -> float:
+    """
+    Calculates the value of a bond at a specific time.
+
+    Args:
+        bond_duration: float
+            The duration of the bond.
+        face_value: int
+            The face value of the bond.
+        years_to_maturity: int
+            The number of years until the bond matures.
+        interest_rate: float
+            The yield rate of the bond.
+        compounding_frequency_yr: int
+            The frequency at which the yield is compounded.
+
+    Returns:
+        bond_value: float
+            The value of the bond at the specified time.
+    """
+
+    if bond_duration < 0 or bond_duration > years_to_maturity:
+        raise ValueError(
+            "Bond duration must be in the range [0, years_to_maturity].")
+
+    if compounding_frequency_yr < 1:
+        raise ValueError(
+            "Compounding frequency must be a positive integer.")
+
+    if interest_rate < 0 or interest_rate > 1:
+        raise ValueError(
+            "Interest rate must be in the range [0, 1].")
+
+    num_time_steps = years_to_maturity * compounding_frequency_yr
+
+    interest_adjusted = 1 + interest_rate
+    coup_val = coupon_value(face_value, interest_rate,
+                            compounding_frequency_yr)
+    bond_value = 0
+
+    # Coupons
+
+    reinvestments = []
+
+    for time_step in range(1, num_time_steps + 1):
+        year = time_step / compounding_frequency_yr
+
+        # Length of time this coupon can be reinvested for
+        reinvestment_time = bond_duration - year
+
+        coupon_reinvestment_val = coup_val * interest_adjusted ** reinvestment_time
+
+        reinvestments.append(coupon_reinvestment_val)
+
+    # Last coupon (including face value)
+
+    # B
+    last_coupon_reinvestment_val = (
+        face_value + coup_val) / (interest_adjusted ** (years_to_maturity - bond_duration))
+
+    reinvestments.append(last_coupon_reinvestment_val)
+
+    bond_value = sum(reinvestments)
+
+    return bond_value
