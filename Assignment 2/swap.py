@@ -140,8 +140,6 @@ def compute_swap_values(notional: float, maturity_periods: list[int], compoundin
         swap_value = swap_value_at_spot(
             fixed_payment, floating_payment, spot_rate, T)
 
-        print(swap_value)
-
         swap_values.append(swap_value)
 
     return swap_values
