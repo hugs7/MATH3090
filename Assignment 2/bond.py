@@ -224,7 +224,8 @@ def coupon_value(
             The value of the coupon payment.
     """
 
-    adjusted_coup_rate = adjusted_coupon_rate(coupon_rate, compounding_frequency_yr)
+    adjusted_coup_rate = adjusted_coupon_rate(
+        coupon_rate, compounding_frequency_yr)
 
     coupon_value = face_value * adjusted_coup_rate
 
@@ -413,7 +414,8 @@ def bond_value_at_time(
     """
 
     if bond_duration < 0 or bond_duration > years_to_maturity:
-        raise ValueError("Bond duration must be in the range [0, years_to_maturity].")
+        raise ValueError(
+            "Bond duration must be in the range [0, years_to_maturity].")
 
     if compounding_frequency_yr < 1:
         raise ValueError("Compounding frequency must be a positive integer.")
@@ -497,7 +499,8 @@ def spot_zero_coupon_yield_curve_continuous(
             raise ValueError("Years to maturity must be non-negative.")
 
         if compounding_frequency_yr < 1:
-            raise ValueError("Compounding frequency must be a positive integer.")
+            raise ValueError(
+                "Compounding frequency must be a positive integer.")
 
         if any(rate < 0 for rate in spot_rates):
             raise ValueError("Spot rates must be non-negative.")
@@ -512,7 +515,8 @@ def spot_zero_coupon_yield_curve_continuous(
             raise ValueError("Face value must be non-negative.")
 
         if present_value > face_value:
-            raise ValueError("Present value must be less than or equal to face value.")
+            raise ValueError(
+                "Present value must be less than or equal to face value.")
 
     coup_val = coupon_value(face_value, coupon_rate, compounding_frequency_yr)
 
@@ -566,7 +570,8 @@ def forward_rate_continuous(
     if time_j > time_k:
         raise ValueError("Time period j must be before time period k.")
 
-    forward_rate = (spot_rate_0_k * time_k - spot_rate_0_j * time_j) / (time_k - time_j)
+    forward_rate = (spot_rate_0_k * time_k - spot_rate_0_j *
+                    time_j) / (time_k - time_j)
 
     return forward_rate
 
@@ -624,9 +629,12 @@ def recursive_zero_coupon_yield_continuous(
 
         if k > 1:
             # Calculate the forward rate for the bond
+            prev_spot_rate = spot_rates[-2]
+            current_spot_rate = spot_rates[-1]
             y_k_1_k = forward_rate_continuous(
-                prev_period, years_to_maturity, spot_rates[-2], spot_rates[-1]
+                prev_period, years_to_maturity, prev_spot_rate, current_spot_rate
             )
+
             forward_rates.append(y_k_1_k)
         else:
             # Forward rate equals the spot rate for the first bond
