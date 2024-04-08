@@ -403,15 +403,42 @@ def spot_zero_coupon_yield_curve_continuous(face_value: int, present_value: floa
             The spot yield curve for the bond.
     """
 
+    # Checks
+    if True:
+        if years_to_maturity < 0:
+            raise ValueError("Years to maturity must be non-negative.")
+
+        if compounding_frequency_yr < 1:
+            raise ValueError(
+                "Compounding frequency must be a positive integer.")
+
+        if interest_rate < 0 or interest_rate > 1:
+            raise ValueError("Interest rate must be in the range [0, 1].")
+
+        if coupon_rate < 0 or coupon_rate > 1:
+            raise ValueError("Coupon rate must be in the range [0, 1].")
+
+        if present_value < 0:
+            raise ValueError("Present value must be non-negative.")
+
+        if face_value < 0:
+            raise ValueError("Face value must be non-negative.")
+
+        if present_value > face_value:
+            raise ValueError(
+                "Present value must be less than or equal to face value.")
+
     coup_val = coupon_value(face_value, coupon_rate, compounding_frequency_yr)
 
+    num_time_steps = years_to_maturity * compounding_frequency_yr
     c_f = coup_val + face_value
+    k_1 = num_time_steps - 1
 
     discount_sum = 0
-    for time_step in range(1, years_to_maturity + 1):
+    for time_step in range(1, k_1 + 1):
         year = time_step / compounding_frequency_yr
 
         discount_sum += interest.continuous_compound_interest_accumulated(
             interest_rate, year)
 
-    return (1 / years_to_maturity) * math.log((coup_val + face_value) / (present_value - coup_val * discount_sum))
+    return (1 / num_time_steps) * math.log((c_f) / (present_value - coup_val * discount_sum))
