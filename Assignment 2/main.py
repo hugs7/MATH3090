@@ -84,9 +84,31 @@ def swaps():
     print(f"sum of swap values: {sum_swap_values}")
 
 
+def strip_test():
+    """
+    Test of recursive zero coupon yield from book"""
+
+    F = 100_000
+    n = 2  # Semi annual
+
+    maturity_periods = [0.5, 1, 1.5]
+    bond_prices = [100961.54, 100_936.33, 100_272.84]
+    c = 0.10
+    expected_zero_yield_rates = [0.08, 0.09, 0.098]
+
+    spot_rates, forward_rates = bond.recursive_zero_coupon_yield_continuous(
+        bond_prices, F, maturity_periods, c, n)
+
+    print(f"spot rates: {spot_rates}")
+    print()
+    print(f"forward rates: {forward_rates}")
+
+
 def main():
     # bonds()
 
+    strip_test()
+    exit(0)
     swaps()
 
 
