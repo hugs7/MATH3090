@@ -2,6 +2,7 @@
 # Date: 27/02/2024
 
 
+import math
 import interest
 
 # ----- Zero Coupon Bonds -----
@@ -375,3 +376,42 @@ def bond_value_at_time(bond_duration: float, face_value: int, years_to_maturity:
     bond_value = sum(reinvestments)
 
     return bond_value
+
+
+# ---- Yield Curves ----
+
+def spot_zero_coupon_yield_curve_continuous(face_value: int, present_value: float, years_to_maturity: int, interest_rate: float, coupon_rate: float, compounding_frequency_yr: int) -> float:
+    """
+    Computes the spot yield curve for a zero coupon bond using continuous compound interest.
+
+    Args:
+        face_value: int
+            The face value of the bond.
+        present_value: float
+            The present value of the bond.
+        years_to_maturity: int
+            The number of years until the bond matures.
+        interest_rate: float
+            The yield rate of the bond.
+        coupon_rate: float
+            The annual coupon rate of the bond.
+        compounding_frequency_yr: int
+            The frequency at which the yield is compounded.
+
+    Returns:
+        spot_yield_curve: list[float]
+            The spot yield curve for the bond.
+    """
+
+    coup_val = coupon_value(face_value, coupon_rate, compounding_frequency_yr)
+
+    c_f = coup_val + face_value
+
+    discount_sum = 0
+    for time_step in range(1, years_to_maturity + 1):
+        year = time_step / compounding_frequency_yr
+
+        discount_sum += interest.continuous_compound_interest_accumulated(
+            interest_rate, year)
+
+    return (1 / years_to_maturity) * math.log((coup_val + face_value) / (present_value - coup_val * discount_sum))
