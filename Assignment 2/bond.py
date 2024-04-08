@@ -543,8 +543,9 @@ def spot_zero_coupon_yield_curve_continuous(
 def forward_rate_continuous(
     time_j: float,
     time_k: float,
-    spot_rate_0_k: float,
     spot_rate_0_j: float,
+    spot_rate_0_k: float,
+    checks: bool = True
 ) -> float:
     """
     Calculate the forward rate between two time periods.
@@ -564,11 +565,20 @@ def forward_rate_continuous(
             The forward rate between time periods j and k: y_{j, k}.
     """
 
-    if time_k < 0 or time_j < 0:
-        raise ValueError("Time periods must be non-negative.")
+    if checks:
+        if time_k < 0 or time_j < 0:
+            raise ValueError("Time periods must be non-negative.")
 
-    if time_j > time_k:
-        raise ValueError("Time period j must be before time period k.")
+        if time_j > time_k:
+            raise ValueError("Time period j must be before time period k.")
+
+        if spot_rate_0_j < 0 or spot_rate_0_k < 0:
+            raise ValueError("Spot rates must be non-negative.")
+
+        if spot_rate_0_j > spot_rate_0_k:
+            raise ValueError(
+                "Spot rate at time period j must be less than spot rate at time period k. " +
+                "This would otherwise cause a negative forward rate!")
 
     forward_rate = (spot_rate_0_k * time_k - spot_rate_0_j *
                     time_j) / (time_k - time_j)
@@ -632,7 +642,7 @@ def recursive_zero_coupon_yield_continuous(
             prev_spot_rate = spot_rates[-2]
             current_spot_rate = spot_rates[-1]
             y_k_1_k = forward_rate_continuous(
-                prev_period, years_to_maturity, prev_spot_rate, current_spot_rate
+                prev_period, years_to_maturity, prev_spot_rate, current_spot_rate, checks=False
             )
 
             forward_rates.append(y_k_1_k)
