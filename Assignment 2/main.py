@@ -8,8 +8,7 @@ def main():
     c = 0.08
     F = 100_000
 
-    present_values = bond.present_values_coupon_bearing_bond_discrete(
-        F, T, c, y, n)
+    present_values = bond.present_values_coupon_bearing_bond_discrete(F, T, c, y, n)
 
     print(present_values)
 
@@ -23,7 +22,7 @@ def main():
 
     # Bond value at |D|
 
-    val_at_d = bond.bond_value_at_time(bond_duration, F, T, y, n)
+    val_at_d = bond.bond_value_at_time(bond_duration, F, T, c, y, n)
 
     print("The bond value at |D| is: ", val_at_d)
 
