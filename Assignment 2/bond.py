@@ -465,7 +465,7 @@ def spot_zero_coupon_yield_curve_continuous(
     face_value: int,
     present_value: float,
     years_to_maturity: int,
-    interest_rate: float,
+    spot_rates: list[float],
     coupon_rate: float,
     compounding_frequency_yr: int,
 ) -> float:
@@ -479,15 +479,15 @@ def spot_zero_coupon_yield_curve_continuous(
             The present value of the bond.
         years_to_maturity: int
             The number of years until the bond matures.
-        interest_rate: float
-            The yield rate of the bond.
+        spot_rates: list[float]
+            A list of the spot rates up to but not including the current time step.
         coupon_rate: float
             The annual coupon rate of the bond.
         compounding_frequency_yr: int
             The frequency at which the yield is compounded.
 
     Returns:
-        spot_yield_curve: list[float]
+        spot_yield: float
             The spot yield curve for the bond.
     """
 
@@ -499,8 +499,8 @@ def spot_zero_coupon_yield_curve_continuous(
         if compounding_frequency_yr < 1:
             raise ValueError("Compounding frequency must be a positive integer.")
 
-        if interest_rate < 0 or interest_rate > 1:
-            raise ValueError("Interest rate must be in the range [0, 1].")
+        if any(rate < 0 for rate in spot_rates):
+            raise ValueError("Spot rates must be non-negative.")
 
         if coupon_rate < 0 or coupon_rate > 1:
             raise ValueError("Coupon rate must be in the range [0, 1].")
@@ -523,11 +523,113 @@ def spot_zero_coupon_yield_curve_continuous(
     discount_sum = 0
     for time_step in range(1, k_1 + 1):
         year = time_step / compounding_frequency_yr
+        spot_rate = spot_rates[time_step - 1]
 
-        discount_sum += interest.continuous_compound_interest_accumulated(
-            interest_rate, year
+        discount_sum += interest.continuous_compound_interest_discounted(
+            spot_rate, year
         )
 
-    return (1 / num_time_steps) * math.log(
+    spot_yield = (1 / num_time_steps) * math.log(
         (c_f) / (present_value - coup_val * discount_sum)
     )
+
+    return spot_yield
+
+
+def forward_rate_continuous(
+    time_j: float,
+    time_k: float,
+    spot_rate_0_k: float,
+    spot_rate_0_j: float,
+) -> float:
+    """
+    Calculate the forward rate between two time periods.
+
+    Args:
+        time_j: float
+            The time period at which the forward rate starts.
+        time_k: float
+            The time period at which the forward rate ends.
+        spot_rate_0_j: float
+            The spot rate at time period j.
+        spot_rate_0_k: float
+            The spot rate at time period k.
+
+    Returns:
+        forward_rate: float
+            The forward rate between time periods j and k: y_{j, k}.
+    """
+
+    if time_k < 0 or time_j < 0:
+        raise ValueError("Time periods must be non-negative.")
+
+    if time_j > time_k:
+        raise ValueError("Time period j must be before time period k.")
+
+    forward_rate = (spot_rate_0_k * time_k - spot_rate_0_j * time_j) / (time_k - time_j)
+
+    return forward_rate
+
+
+def recursive_zero_coupon_yield_continuous(
+    coupon_bond_prices: list[float],
+    face_value: int,
+    maturity_periods: list[int],
+    coupon_rate: float,
+    compounding_frequency_yr: int,
+) -> tuple[list[float], list[float]]:
+    """
+    Calculates the one-period forward rates (recursively) given prices of coupon bearing bonds.
+
+    Args:
+        coupon_bond_prices: list[float]
+            The prices of the coupon bearing bonds.
+        face_value: int
+            The face value of the bond.
+        maturity_periods: list[int]
+            The number of periods until the bond matures.
+        coupon_rate: float
+            The annual coupon rate of the bond.
+        compounding_frequency_yr: int
+            The frequency at which the yield is compounded.
+
+    Returns:
+        spot_rates: list[float]
+            The spot rates of the bonds.
+        forward_rates: list[float]
+            The forward rates of the bonds.
+    """
+
+    num_time_steps = len(coupon_bond_prices)
+    forward_rates = []
+    # Bond 1 can be seen as a zero-coupon bond with face value F + C
+    # Since it has no coupons, it's yield is the same as the spot rate
+    spot_rates = []
+
+    for k, bond_price in enumerate(coupon_bond_prices, start=1):
+        years_to_maturity = maturity_periods[k - 1]
+        prev_period = maturity_periods[k - 2] if k > 1 else 0
+
+        # Calculate the spot rate for the bond
+        y_0_k = spot_zero_coupon_yield_curve_continuous(
+            face_value,
+            bond_price,
+            years_to_maturity,
+            spot_rates,
+            coupon_rate,
+            compounding_frequency_yr,
+        )
+
+        spot_rates.append(y_0_k)
+
+        if k > 1:
+            # Calculate the forward rate for the bond
+            y_k_1_k = forward_rate_continuous(
+                prev_period, years_to_maturity, spot_rates[-2], spot_rates[-1]
+            )
+            forward_rates.append(y_k_1_k)
+        else:
+            # Forward rate equals the spot rate for the first bond
+            forward_rates.append(y_0_k)
+
+    return spot_rates, forward_rates
