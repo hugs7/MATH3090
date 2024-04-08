@@ -470,6 +470,7 @@ def spot_zero_coupon_yield_curve_continuous(
     spot_rates: list[float],
     coupon_rate: float,
     compounding_frequency_yr: int,
+    checks: bool = True
 ) -> float:
     """
     Computes the spot yield curve for a zero coupon bond using continuous compound interest.
@@ -494,7 +495,7 @@ def spot_zero_coupon_yield_curve_continuous(
     """
 
     # Checks
-    if True:
+    if checks:
         if years_to_maturity < 0:
             raise ValueError("Years to maturity must be non-negative.")
 
@@ -514,13 +515,9 @@ def spot_zero_coupon_yield_curve_continuous(
         if face_value < 0:
             raise ValueError("Face value must be non-negative.")
 
-        if present_value > face_value:
-            raise ValueError(
-                "Present value must be less than or equal to face value.")
-
     coup_val = coupon_value(face_value, coupon_rate, compounding_frequency_yr)
 
-    num_time_steps = years_to_maturity * compounding_frequency_yr
+    num_time_steps = int(years_to_maturity * compounding_frequency_yr)
     c_f = coup_val + face_value
     k_1 = num_time_steps - 1
 
@@ -533,7 +530,7 @@ def spot_zero_coupon_yield_curve_continuous(
             spot_rate, year
         )
 
-    spot_yield = (1 / num_time_steps) * math.log(
+    spot_yield = (compounding_frequency_yr / num_time_steps) * math.log(
         (c_f) / (present_value - coup_val * discount_sum)
     )
 
@@ -592,6 +589,7 @@ def recursive_zero_coupon_yield_continuous(
     maturity_periods: list[int],
     coupon_rate: float,
     compounding_frequency_yr: int,
+    checks: bool = True
 ) -> tuple[list[float], list[float]]:
     """
     Calculates the one-period forward rates (recursively) given prices of coupon bearing bonds.
@@ -615,10 +613,28 @@ def recursive_zero_coupon_yield_continuous(
             The forward rates of the bonds.
     """
 
-    num_time_steps = len(coupon_bond_prices)
-    forward_rates = []
+    if checks:
+        # Check lengths of input lists
+        if len(coupon_bond_prices) != len(maturity_periods):
+            raise ValueError(
+                "The number of bond prices must equal the number of maturity periods.")
+
+        if compounding_frequency_yr < 1:
+            raise ValueError(
+                "Compounding frequency must be a positive integer.")
+
+        if any(price < 0 for price in coupon_bond_prices):
+            raise ValueError("Bond prices must be non-negative.")
+
+        if face_value < 0:
+            raise ValueError("Face value must be non-negative.")
+
     # Bond 1 can be seen as a zero-coupon bond with face value F + C
-    # Since it has no coupons, it's yield is the same as the spot rate
+    # Since it has no coupons, it's yield is the same as the spot rate.
+    # For the remaining bonds, we can calculate the spot rate and forward rate
+    # with the current and previous bonds' spot rates.
+
+    forward_rates = []
     spot_rates = []
 
     for k, bond_price in enumerate(coupon_bond_prices, start=1):
