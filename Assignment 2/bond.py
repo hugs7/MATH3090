@@ -224,9 +224,9 @@ def coupon_value(
             The value of the coupon payment.
     """
 
-    coupon_value = face_value * adjusted_coupon_rate(
-        coupon_rate, compounding_frequency_yr
-    )
+    adjusted_coup_rate = adjusted_coupon_rate(coupon_rate, compounding_frequency_yr)
+
+    coupon_value = face_value * adjusted_coup_rate
 
     return coupon_value
 
@@ -386,6 +386,7 @@ def bond_value_at_time(
     bond_duration: float,
     face_value: int,
     years_to_maturity: int,
+    coupon_rate: float,
     interest_rate: float,
     compounding_frequency_yr: int,
 ) -> float:
@@ -399,6 +400,8 @@ def bond_value_at_time(
             The face value of the bond.
         years_to_maturity: int
             The number of years until the bond matures.
+        coupon_rate: float
+            The annual coupon rate of the bond.
         interest_rate: float
             The yield rate of the bond.
         compounding_frequency_yr: int
@@ -422,7 +425,7 @@ def bond_value_at_time(
     t_1 = num_time_steps - 1
 
     interest_adjusted = 1 + interest_rate
-    coup_val = coupon_value(face_value, interest_rate, compounding_frequency_yr)
+    coup_val = coupon_value(face_value, coupon_rate, compounding_frequency_yr)
     bond_value = 0
 
     # Coupons
@@ -434,7 +437,9 @@ def bond_value_at_time(
 
         # Length of time this coupon can be reinvested for
         reinvestment_time = bond_duration - year
-
+        print(
+            f"Time step {time_step}, year {year}, reinvestment time {reinvestment_time}, coupon value {coup_val}"
+        )
         coupon_reinvestment_val = coup_val * interest_adjusted**reinvestment_time
 
         reinvestments.append(coupon_reinvestment_val)
@@ -447,7 +452,7 @@ def bond_value_at_time(
     )
 
     reinvestments.append(last_coupon_reinvestment_val)
-
+    print(reinvestments)
     bond_value = sum(reinvestments)
 
     return bond_value
