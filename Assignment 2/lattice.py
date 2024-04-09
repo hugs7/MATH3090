@@ -73,7 +73,10 @@ class BinNode(Node):
         self.down = down
 
     def __repr__(self) -> str:
-        return f"{self.value:.4f}"
+        if self.down and self.up:
+            return f"({self.value:.4f}, {self.down.get_value():.4f}, {self.up.get_value():.4f})"
+        else:
+            return f"{self.value:.4f}"
 
     def get_parent(self) -> Union["BinNode", None]:
         return self.parent
@@ -107,7 +110,7 @@ class BinNode(Node):
         self.down = down
 
 
-class Lattice:
+class BinLattice:
     def __init__(self, head_node: BinNode) -> None:
         self.head_node = head_node
 
@@ -137,14 +140,14 @@ class Lattice:
         for _ in range(depth):
             new_nodes = []
             for node in nodes:
-                up_child = node.get_up()
                 down_child = node.get_down()
-
-                if up_child is not None:
-                    new_nodes.append(up_child)
+                up_child = node.get_up()
 
                 if down_child is not None:
                     new_nodes.append(down_child)
+
+                if up_child is not None:
+                    new_nodes.append(up_child)
 
             nodes = new_nodes
 
@@ -171,19 +174,60 @@ class Lattice:
             next_level_nodes = []
 
             for parent_node in current_level_nodes:
-                up_value = parent_node.get_value() * up_factor
                 down_value = parent_node.get_value() * down_factor
+                up_value = parent_node.get_value() * up_factor
 
-                up_node = BinNode(up_value, i + 1, parent_node, None, None)
                 down_node = BinNode(down_value, i + 1, parent_node, None, None)
+                up_node = BinNode(up_value, i + 1, parent_node, None, None)
 
-                parent_node.set_up(up_node)
                 parent_node.set_down(down_node)
+                parent_node.set_up(up_node)
 
-                next_level_nodes += [up_node, down_node]
+                next_level_nodes += [down_node, up_node]
 
             # Reset the current level nodes to the next level nodes
             current_level_nodes = next_level_nodes
+
+    def check_path(self, path: list[str]) -> bool:
+        """
+        Checks a path of a list of strings of 'u' and 'd's.
+
+        Returns:
+            True if the path is valid, False otherwise
+        """
+
+        for step in path:
+            if step not in ["u", "d"]:
+                return False
+
+        return True
+
+    def get_forward_rate(self, path: list[str]) -> float:
+        """
+        Get the forward rate given a path (e.g. ['u', 'd', 'u']
+        or ['u', 'u', 'd'], etc.)
+
+        :param path: the path to the forward rate
+
+        :return: the forward rate
+        """
+
+        # Check path
+        if not self.check_path(path):
+            print(f"{Fore.RED}Invalid path{Style.RESET_ALL}")
+            return 0.0
+
+        current_node = self.head_node
+
+        for step in path:
+            if step == "u":
+                current_node = current_node.get_up()
+            else:
+                current_node = current_node.get_down()
+
+        rate_value = current_node.get_value()
+
+        return rate_value
 
     def __repr__(self) -> str:
         """
@@ -231,7 +275,7 @@ class Lattice:
 
 def main():
     head_node = BinNode(1, 0, None, None, None)
-    lattice = Lattice(head_node)
+    lattice = BinLattice(head_node)
 
     lattice.construct_bin_lattice(2, 0.5, 3)
 
