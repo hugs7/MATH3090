@@ -3,7 +3,7 @@ Helper for computing stochastic lattices
 for binomial interest rate model
 """
 
-from typing import Union
+from typing import List, Union
 from colorama import Fore, Style
 
 import bond
@@ -80,6 +80,14 @@ class BinNode(Node):
         self.up = up
         self.down = down
 
+        if up is not None:
+            # Set the parent of the up node to be this node
+            up.set_parent(self)
+
+        if down is not None:
+            # Set the parent of the down node to be this node
+            down.set_parent(self)
+
     def __eq__(self, other: "BinNode") -> bool:
         if other is None:
             return False
@@ -97,6 +105,9 @@ class BinNode(Node):
 
     def get_down(self) -> Union["BinNode", None]:
         return self.down
+
+    def set_parent(self, parent: "BinNode") -> None:
+        self.parent = parent
 
     def set_children(self, children: list["Node"]) -> None:
         super().set_children(children)
@@ -290,7 +301,7 @@ class BinLattice:
 
         node = self.get_node_by_path(path)
 
-        return bond.price_zero_coupon_bond(node.get_value())
+        return bond.price_zero_coupon_bond_leaf(node.get_value())
 
     def get_lattice_subtree(self, depth: int) -> "BinLattice":
         """
@@ -317,7 +328,7 @@ class BinLattice:
 
         return lattice_copy
 
-    def construct_zero_spot_lattice(self, future_time_period: int) -> "BinLattice":
+    def construct_zero_spot_lattice(self, future_time_period: int, up_pr: float, down_pr: float) -> "BinLattice":
         """
         Constructs a new lattice such that the head node is y_{0, future_time_period} 
         with the forward rates given the current lattice of zero spot rates
@@ -327,6 +338,10 @@ class BinLattice:
                 The upper bound / period to construct the zero spot lattice for. E.g.
                 if 4 is passed, the head node of the newly constructed lattice
                 will be y_{0, 4}
+            up_pr: float
+                The probability of an up move within the binomial model
+            down_pr: float
+                The probability of a down move within the binomial model
 
         Returns:
             A new lattice with forward rates
@@ -341,7 +356,66 @@ class BinLattice:
         lattice_subtree = self.get_lattice_subtree(future_time_period)
 
         print(f"lattice_subtree: \n{lattice_subtree}")
-        # Start at the leaf nodes and work backwards.
+
+        # Construct new lattice bottom up, (i.e. starting at leaf nodes)
+
+        depth = future_time_period
+
+        while depth >= 0:
+            current_nodes = lattice_subtree.get_nodes_at_depth(depth)
+            if depth == future_time_period:
+                # Leaf case - default child nodes to 1s
+                child_nodes = [1 for _ in range(len(current_nodes))]
+            else:
+                child_nodes = lattice_subtree.get_nodes_at_depth(depth + 1)
+
+            new_nodes: List[BinNode] = []
+
+            for i, child_node in enumerate(current_nodes):
+                forward_rate = child_node.get_value()
+
+                if depth == future_time_period:
+                    # Leaf case
+                    # Compute their zero coupon bond price
+                    bond_price = bond.price_zero_coupon_bond_leaf(
+                        forward_rate)
+                else:
+                    # Non-leaf case
+                    # zero coupon bond price is the expected value of the two child nodes
+                    up_rate = child_node.get_up().get_value()
+                    down_rate = child_node.get_down().get_value()
+
+                    bond_price = bond.price_zero_coupon_bond_non_leaf(
+                        forward_rate, up_rate, down_rate, up_pr, down_pr)
+
+                if depth == future_time_period:
+                    up_child = None
+                    down_child = None
+                else:
+                    up_child = child_nodes[i]
+                    down_child = child_nodes[i + 1]
+
+                new_node = BinNode(bond_price, depth, None,
+                                   up_child, down_child)
+                new_nodes.append(new_node)
+
+            # Move to the next level up in the lattice
+            depth -= 1
+
+        # At this point, new_nodes should contain only the head node
+        # of the new lattice
+
+        if len(new_nodes) != 1:
+            print(
+                f"{Fore.RED}Error: Expected 1 node, got {len(new_nodes)}{Style.RESET_ALL}")
+            return None
+
+        new_head_node = new_nodes[0]
+
+        spot_lattice = BinLattice(new_head_node)
+        spot_lattice.depth = future_time_period
+        print("Spot Lattice")
+        print(spot_lattice)
 
     def __repr__(self) -> str:
         """
@@ -398,6 +472,9 @@ class BinLattice:
 
 
 def main():
+    p = 0.6
+    q = 1 - p
+
     head_node = BinNode(1, 0, None, None, None)
     lattice = BinLattice(head_node)
 
@@ -407,7 +484,7 @@ def main():
 
     print("-"*100)
 
-    lattice.construct_zero_spot_lattice(3)
+    lattice.construct_zero_spot_lattice(3, p, q)
 
 
 if __name__ == "__main__":
