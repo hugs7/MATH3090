@@ -1,5 +1,6 @@
 import bond
 import swap
+from lattice import BinNode, Lattice
 
 
 def bonds():
@@ -145,12 +146,39 @@ def strip_test():
     print(f"forward rates: {forward_rates}")
 
 
+def lattice():
+    print("Question 3")
+
+    # Maturity
+    T = 3
+
+    # zero spot yield rate for time step 0 to time step 1
+    y_0_1 = 0.02
+
+    # Probability of increase / decrease
+    p = 0.6
+    q = 1 - p
+
+    # Increase / Decrease factors
+    u = 1.3
+    d = 0.9
+
+    head_node = BinNode(y_0_1, 0, None, None, None)
+    zero_spot_lattice = Lattice(head_node)
+
+    zero_spot_lattice.construct_bin_lattice(u, d, T)
+
+    print(zero_spot_lattice)
+
+
 def main():
     # bonds()
 
     # strip_test()
-    # exit(0)
-    swaps()
+
+    # swaps()
+
+    lattice()
 
 
 if __name__ == "__main__":
