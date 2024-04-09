@@ -73,7 +73,7 @@ class BinNode(Node):
         self.down = down
 
     def __repr__(self) -> str:
-        return f"BinNode({self.value:.2f}, {self.depth})"
+        return f"{self.value:.4f}"
 
     def get_parent(self) -> Union["BinNode", None]:
         return self.parent
@@ -112,6 +112,13 @@ class Lattice:
         self.head_node = head_node
 
         self.depth = 1
+
+        # generate dummy bin node to compute the length of it's string representation
+        # to determine the spacing between nodes
+
+        dummy_node = BinNode(1, 0, None, None, None)
+        self.separator = " | "
+        self.NODE_SPACE = len(dummy_node.__repr__()) + len(self.separator)
 
     def get_head_node(self) -> Node:
         return self.head_node
@@ -195,12 +202,11 @@ class Lattice:
             Compute the left padding for a node at a certain depth
             """
 
-            NODE_SPACE = 17 + 2 * (2 + 1) - 2
             num_nodes_bottom = num_nodes_at_depth(tree_depth)
             num_nodes_current = num_nodes_at_depth(current_depth)
 
-            bottom_width = NODE_SPACE * num_nodes_bottom
-            current_width = NODE_SPACE * num_nodes_current
+            bottom_width = self.NODE_SPACE * num_nodes_bottom
+            current_width = self.NODE_SPACE * num_nodes_current
 
             return int((bottom_width - current_width) // 2)
 
@@ -212,9 +218,9 @@ class Lattice:
                 break
             left_padding = compute_left_padding(self.depth, level + 1)
             lattice_str += " " * left_padding
-            lattice_str += "| "
+            lattice_str += self.separator
             for node in level_nodes:
-                lattice_str += node.__repr__() + " | "
+                lattice_str += node.__repr__() + self.separator
 
             lattice_str += " " * left_padding
             if level < self.depth - 1:
