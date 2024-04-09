@@ -224,7 +224,8 @@ def coupon_value(
             The value of the coupon payment.
     """
 
-    adjusted_coup_rate = adjusted_coupon_rate(coupon_rate, compounding_frequency_yr)
+    adjusted_coup_rate = adjusted_coupon_rate(
+        coupon_rate, compounding_frequency_yr)
 
     coupon_value = face_value * adjusted_coup_rate
 
@@ -413,7 +414,8 @@ def bond_value_at_time(
     """
 
     if bond_duration < 0 or bond_duration > years_to_maturity:
-        raise ValueError("Bond duration must be in the range [0, years_to_maturity].")
+        raise ValueError(
+            "Bond duration must be in the range [0, years_to_maturity].")
 
     if compounding_frequency_yr < 1:
         raise ValueError("Compounding frequency must be a positive integer.")
@@ -468,6 +470,7 @@ def spot_zero_coupon_yield_curve_continuous(
     spot_rates: list[float],
     coupon_rate: float,
     compounding_frequency_yr: int,
+    checks: bool = True
 ) -> float:
     """
     Computes the spot yield curve for a zero coupon bond using continuous compound interest.
@@ -492,12 +495,13 @@ def spot_zero_coupon_yield_curve_continuous(
     """
 
     # Checks
-    if True:
+    if checks:
         if years_to_maturity < 0:
             raise ValueError("Years to maturity must be non-negative.")
 
         if compounding_frequency_yr < 1:
-            raise ValueError("Compounding frequency must be a positive integer.")
+            raise ValueError(
+                "Compounding frequency must be a positive integer.")
 
         if any(rate < 0 for rate in spot_rates):
             raise ValueError("Spot rates must be non-negative.")
@@ -511,12 +515,9 @@ def spot_zero_coupon_yield_curve_continuous(
         if face_value < 0:
             raise ValueError("Face value must be non-negative.")
 
-        if present_value > face_value:
-            raise ValueError("Present value must be less than or equal to face value.")
-
     coup_val = coupon_value(face_value, coupon_rate, compounding_frequency_yr)
 
-    num_time_steps = years_to_maturity * compounding_frequency_yr
+    num_time_steps = int(years_to_maturity * compounding_frequency_yr)
     c_f = coup_val + face_value
     k_1 = num_time_steps - 1
 
@@ -529,7 +530,7 @@ def spot_zero_coupon_yield_curve_continuous(
             spot_rate, year
         )
 
-    spot_yield = (1 / num_time_steps) * math.log(
+    spot_yield = (compounding_frequency_yr / num_time_steps) * math.log(
         (c_f) / (present_value - coup_val * discount_sum)
     )
 
@@ -539,8 +540,9 @@ def spot_zero_coupon_yield_curve_continuous(
 def forward_rate_continuous(
     time_j: float,
     time_k: float,
-    spot_rate_0_k: float,
     spot_rate_0_j: float,
+    spot_rate_0_k: float,
+    checks: bool = True
 ) -> float:
     """
     Calculate the forward rate between two time periods.
@@ -560,13 +562,23 @@ def forward_rate_continuous(
             The forward rate between time periods j and k: y_{j, k}.
     """
 
-    if time_k < 0 or time_j < 0:
-        raise ValueError("Time periods must be non-negative.")
+    if checks:
+        if time_k < 0 or time_j < 0:
+            raise ValueError("Time periods must be non-negative.")
 
-    if time_j > time_k:
-        raise ValueError("Time period j must be before time period k.")
+        if time_j > time_k:
+            raise ValueError("Time period j must be before time period k.")
 
-    forward_rate = (spot_rate_0_k * time_k - spot_rate_0_j * time_j) / (time_k - time_j)
+        if spot_rate_0_j < 0 or spot_rate_0_k < 0:
+            raise ValueError("Spot rates must be non-negative.")
+
+        if spot_rate_0_j > spot_rate_0_k:
+            raise ValueError(
+                "Spot rate at time period j must be less than spot rate at time period k. " +
+                "This would otherwise cause a negative forward rate!")
+
+    forward_rate = (spot_rate_0_k * time_k - spot_rate_0_j *
+                    time_j) / (time_k - time_j)
 
     return forward_rate
 
@@ -577,6 +589,7 @@ def recursive_zero_coupon_yield_continuous(
     maturity_periods: list[int],
     coupon_rate: float,
     compounding_frequency_yr: int,
+    checks: bool = True
 ) -> tuple[list[float], list[float]]:
     """
     Calculates the one-period forward rates (recursively) given prices of coupon bearing bonds.
@@ -600,10 +613,28 @@ def recursive_zero_coupon_yield_continuous(
             The forward rates of the bonds.
     """
 
-    num_time_steps = len(coupon_bond_prices)
-    forward_rates = []
+    if checks:
+        # Check lengths of input lists
+        if len(coupon_bond_prices) != len(maturity_periods):
+            raise ValueError(
+                "The number of bond prices must equal the number of maturity periods.")
+
+        if compounding_frequency_yr < 1:
+            raise ValueError(
+                "Compounding frequency must be a positive integer.")
+
+        if any(price < 0 for price in coupon_bond_prices):
+            raise ValueError("Bond prices must be non-negative.")
+
+        if face_value < 0:
+            raise ValueError("Face value must be non-negative.")
+
     # Bond 1 can be seen as a zero-coupon bond with face value F + C
-    # Since it has no coupons, it's yield is the same as the spot rate
+    # Since it has no coupons, it's yield is the same as the spot rate.
+    # For the remaining bonds, we can calculate the spot rate and forward rate
+    # with the current and previous bonds' spot rates.
+
+    forward_rates = []
     spot_rates = []
 
     for k, bond_price in enumerate(coupon_bond_prices, start=1):
@@ -624,9 +655,12 @@ def recursive_zero_coupon_yield_continuous(
 
         if k > 1:
             # Calculate the forward rate for the bond
+            prev_spot_rate = spot_rates[-2]
+            current_spot_rate = spot_rates[-1]
             y_k_1_k = forward_rate_continuous(
-                prev_period, years_to_maturity, spot_rates[-2], spot_rates[-1]
+                prev_period, years_to_maturity, prev_spot_rate, current_spot_rate, checks=False
             )
+
             forward_rates.append(y_k_1_k)
         else:
             # Forward rate equals the spot rate for the first bond
