@@ -667,3 +667,24 @@ def recursive_zero_coupon_yield_continuous(
             forward_rates.append(y_0_k)
 
     return spot_rates, forward_rates
+
+
+def price_zero_coupon_bond(forward_rate: float) -> float:
+    """
+    Computes the price of a zero coupon bond with F = $1 
+    given a forward rate.
+
+    E.g. returns y_{0, 4} given y_{3, 4}
+
+    Args:
+        forward_rate: float
+            The forward rate.
+
+    Returns:
+        zero_coupon_yield: float
+            The zero coupon yield.
+    """
+
+    zero_coupon_spot_rate = 1 / (1 + forward_rate)
+
+    return zero_coupon_spot_rate

@@ -4,8 +4,9 @@ for binomial interest rate model
 """
 
 from typing import Union
-
 from colorama import Fore, Style
+
+import bond
 
 
 class Node:
@@ -80,6 +81,9 @@ class BinNode(Node):
         self.down = down
 
     def __eq__(self, other: "BinNode") -> bool:
+        if other is None:
+            return False
+
         return self.value == other.value and self.depth == other.depth
 
     def __repr__(self) -> str:
@@ -94,6 +98,18 @@ class BinNode(Node):
     def get_down(self) -> Union["BinNode", None]:
         return self.down
 
+    def set_children(self, children: list["Node"]) -> None:
+        super().set_children(children)
+
+        # Also set the up and down children
+        if len(children) == 2:
+            self.up = children[0]
+            self.down = children[1]
+
+        else:
+            self.up = None
+            self.down = None
+
     def set_up(self, up: "BinNode") -> None:
         if self.up is not None:
             # Need to remove the old up node from the children
@@ -105,6 +121,9 @@ class BinNode(Node):
 
         self.up = up
 
+        # Add the new up node to the children
+        self.children.append(up)
+
     def set_down(self, down: "BinNode") -> None:
         if self.down is not None:
             # Need to remove the old down node from the children
@@ -115,6 +134,9 @@ class BinNode(Node):
                 print(f"{Fore.RED}Error: down node not in children{Style.RESET_ALL}")
 
         self.down = down
+
+        # Add the new down node to the children
+        self.children.append(down)
 
 
 class BinLattice:
@@ -130,10 +152,13 @@ class BinLattice:
         self.separator = " | "
         self.NODE_SPACE = len(dummy_node.__repr__()) + len(self.separator)
 
-    def get_head_node(self) -> Node:
+        self.up_factor = None
+        self.down_factor = None
+
+    def get_head_node(self) -> BinNode:
         return self.head_node
 
-    def get_nodes_at_depth(self, depth: int) -> list[Node]:
+    def get_nodes_at_depth(self, depth: int) -> list[BinNode]:
         """
         Get all nodes at a certain depth
 
@@ -181,6 +206,8 @@ class BinLattice:
         """
 
         self.depth = depth
+        self.up_factor = up_factor
+        self.down_factor = down_factor
 
         current_level_nodes = [self.head_node]
 
@@ -250,6 +277,72 @@ class BinLattice:
 
         return current_node
 
+    def spot_rate_from_path(self, path: Union[str, list[str]]) -> float:
+        """
+        Computes the price, P of a zero coupon bond maturing at len(path) given a path
+
+        Args:
+            path: the path to check as a list of strings or a string
+
+        Returns:
+            The price of the zero coupon bond at the end of the path
+        """
+
+        node = self.get_node_by_path(path)
+
+        return bond.price_zero_coupon_bond(node.get_value())
+
+    def get_lattice_subtree(self, depth: int) -> "BinLattice":
+        """
+        Gets a subtree of the lattice with a certain depth
+
+        Args:
+            depth: the depth of the subtree
+
+        Returns:
+            A new lattice with the subtree
+        """
+
+        if depth < 0 or depth > self.depth:
+            print(
+                f"{Fore.RED}Invalid depth. Depth must be in the range [0, {self.depth}].{Style.RESET_ALL}")
+            return None
+
+        # Create copy of tree
+        lattice_copy = BinLattice(self.head_node)
+
+        # Recreate the lattice up to the specified depth
+        lattice_copy.construct_bin_lattice(
+            self.up_factor, self.down_factor, depth)
+
+        return lattice_copy
+
+    def construct_zero_spot_lattice(self, future_time_period: int) -> "BinLattice":
+        """
+        Constructs a new lattice such that the head node is y_{0, future_time_period} 
+        with the forward rates given the current lattice of zero spot rates
+
+        Args:
+            future_time_period: int
+                The upper bound / period to construct the zero spot lattice for. E.g.
+                if 4 is passed, the head node of the newly constructed lattice
+                will be y_{0, 4}
+
+        Returns:
+            A new lattice with forward rates
+        """
+
+        if future_time_period < 0 or future_time_period > self.depth:
+            print(
+                f"{Fore.RED}Invalid forward time period. Forward time period must be in the range [0, {self.depth}].{Style.RESET_ALL}")
+            return None
+
+        # Get subtree of the lattice up to the forward time period
+        lattice_subtree = self.get_lattice_subtree(future_time_period)
+
+        print(f"lattice_subtree: \n{lattice_subtree}")
+        # Start at the leaf nodes and work backwards.
+
     def __repr__(self) -> str:
         """
         Prints the lattice in a readable format
@@ -308,9 +401,13 @@ def main():
     head_node = BinNode(1, 0, None, None, None)
     lattice = BinLattice(head_node)
 
-    lattice.construct_bin_lattice(2, 0.5, 3)
+    lattice.construct_bin_lattice(2, 0.5, 5)
 
     print(lattice)
+
+    print("-"*100)
+
+    lattice.construct_zero_spot_lattice(3)
 
 
 if __name__ == "__main__":
