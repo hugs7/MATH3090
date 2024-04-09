@@ -27,6 +27,8 @@ def bonds():
 
     print("The bond value at |D| is: ", val_at_d)
 
+
+def swaps():
     print("QUESTION 2b")
     bond_prices = [
         99412,
