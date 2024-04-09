@@ -15,12 +15,15 @@ class Node:
 
     def __init__(self, value: float, depth: int, children: list["Node"]) -> None:
         """
-        Initialize a node with a value and children
+        Initialise a node with a value and children
 
-        :param value: the value of the node
-        :param children: the children of the node
+        Args:
+            value: the value of the node
+            depth: the depth of the node indexed from 0
+            children: the children of the node
 
-        :return: None
+        Returns:
+            None
         """
 
         self.value = value
@@ -54,13 +57,17 @@ class BinNode(Node):
         down: Union["BinNode", None],
     ) -> None:
         """
-        Initialize a binomial node with a value and children
+        Initialise a binomial node with a value and children
 
-        :param value: the value of the node
-        :param up: the value of the up child
-        :param down: the value of the down child
+        Args:
+            value: the value of the node
+            depth: the depth of the node indexed from 0
+            parent: the parent of the node
+            up: the up child of the node
+            down: the down child of the node
 
-        :return: None
+        Returns:
+            None
         """
 
         children = [up, down]
@@ -72,8 +79,11 @@ class BinNode(Node):
         self.up = up
         self.down = down
 
+    def __eq__(self, other: "BinNode") -> bool:
+        return self.value == other.value and self.depth == other.depth
+
     def __repr__(self) -> str:
-        return f"{self.value:.4f}"
+        return f"{self.value:.5f}"
 
     def get_parent(self) -> Union["BinNode", None]:
         return self.parent
@@ -111,12 +121,12 @@ class BinLattice:
     def __init__(self, head_node: BinNode) -> None:
         self.head_node = head_node
 
-        self.depth = 1
+        self.depth = 0
 
         # generate dummy bin node to compute the length of it's string representation
         # to determine the spacing between nodes
 
-        dummy_node = BinNode(1, 0, None, None, None)
+        dummy_node = BinNode(0, 0, None, None, None)
         self.separator = " | "
         self.NODE_SPACE = len(dummy_node.__repr__()) + len(self.separator)
 
@@ -127,23 +137,28 @@ class BinLattice:
         """
         Get all nodes at a certain depth
 
-        :param depth: the depth to get nodes at
+        Args:
+            depth: the depth to get the nodes at, indexed from 0
 
-        :return: list of nodes at that depth
+        Returns:
+            A list of nodes at the specified depth
         """
 
         nodes = [self.head_node]
 
-        for _ in range(depth):
+        if depth == 0:
+            return nodes
+
+        for d in range(depth):
             new_nodes = []
             for node in nodes:
                 down_child = node.get_down()
                 up_child = node.get_up()
 
-                if down_child is not None:
+                if down_child is not None and down_child not in new_nodes:
                     new_nodes.append(down_child)
 
-                if up_child is not None:
+                if up_child is not None and up_child not in new_nodes:
                     new_nodes.append(up_child)
 
             nodes = new_nodes
@@ -156,26 +171,27 @@ class BinLattice:
         """
         Construct a binomial lattice
 
-        :param up_factor: the factor to multiply by for an up move
-        :param down_factor: the factor to multiply by for a down move
-        :param depth: the depth of the lattice
+        Args:
+            up_factor: the factor to multiply the parent node value by to get the up child value
+            down_factor: the factor to multiply the parent node value by to get the down child value
+            depth: the depth of the lattice
 
-        :return: None
+        Returns:
+            None
         """
 
         self.depth = depth
 
         current_level_nodes = [self.head_node]
 
-        for i in range(depth):
-            next_level_nodes = []
-
-            if i == depth - 1:
+        for i in range(depth + 1):
+            if i == depth:
                 # If we are at the last level, we don't need to create any children
                 break
 
-            for parent_node in current_level_nodes:
+            next_level_nodes = []
 
+            for parent_node in current_level_nodes:
                 down_value = parent_node.get_value() * down_factor
                 up_value = parent_node.get_value() * up_factor
 
@@ -232,9 +248,7 @@ class BinLattice:
             else:
                 current_node = current_node.get_down()
 
-        rate_value = current_node
-
-        return rate_value
+        return current_node
 
     def __repr__(self) -> str:
         """
@@ -244,9 +258,12 @@ class BinLattice:
         def num_nodes_at_depth(depth: int) -> int:
             """
             Compute the number of nodes at a certain depth
+
+            Args:
+                depth: the depth to compute the number of nodes at, indexed from 0
             """
 
-            return 2 ** (depth - 1)
+            return depth + 1
 
         def compute_left_padding(tree_depth: int, current_depth: int) -> int:
             """
@@ -256,26 +273,33 @@ class BinLattice:
             num_nodes_bottom = num_nodes_at_depth(tree_depth)
             num_nodes_current = num_nodes_at_depth(current_depth)
 
-            bottom_width = self.NODE_SPACE * num_nodes_bottom
-            current_width = self.NODE_SPACE * num_nodes_current
+            bottom_width = self.NODE_SPACE * \
+                num_nodes_bottom
+            current_width = self.NODE_SPACE * \
+                num_nodes_current
 
-            return int((bottom_width - current_width) // 2)
+            diff = bottom_width - current_width
+            half_diff = int(diff // 2)
+
+            if current_depth == tree_depth:
+                return half_diff
+            else:
+                return half_diff + len(self.separator)
 
         lattice_str = ""
 
-        for level in range(self.depth):
+        for level in range(self.depth + 1):
             level_nodes = self.get_nodes_at_depth(level)
             if len(level_nodes) == 0:
                 break
-            left_padding = compute_left_padding(self.depth, level + 1)
+            left_padding = compute_left_padding(self.depth, level)
             lattice_str += " " * left_padding
             lattice_str += self.separator
             for node in level_nodes:
                 lattice_str += node.__repr__() + self.separator
 
             lattice_str += " " * left_padding
-            if level < self.depth - 1:
-                lattice_str += "\n"
+            lattice_str += "\n"
 
         return lattice_str
 
