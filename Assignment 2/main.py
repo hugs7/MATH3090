@@ -26,7 +26,7 @@ def main():
 
     print("The bond value at |D| is: ", val_at_d)
 
-    print("QUESTION 2a")
+    print("QUESTION 2b")
     bond_prices = [
         99412,
         97339,
