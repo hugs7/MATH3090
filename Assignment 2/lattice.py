@@ -151,15 +151,18 @@ class BinNode(Node):
 
 
 class BinLattice:
-    def __init__(self, head_node: BinNode) -> None:
+    def __init__(self, head_node: BinNode, depth: int = 0) -> None:
         self.head_node = head_node
 
-        self.depth = 0
+        self.depth = depth
 
         # generate dummy bin node to compute the length of it's string representation
         # to determine the spacing between nodes
 
-        dummy_node = BinNode(0, 0, None, None, None)
+        dummy_up_child = BinNode(0, 1, None, None, None)
+        dummy_down_child = BinNode(0, 1, None, None, None)
+        dummy_node = BinNode(0, 0, None, dummy_up_child, dummy_down_child)
+
         self.separator = " | "
         self.NODE_SPACE = len(dummy_node.__repr__()) + len(self.separator)
 
@@ -412,10 +415,8 @@ class BinLattice:
 
         new_head_node = new_nodes[0]
 
-        spot_lattice = BinLattice(new_head_node)
-        spot_lattice.depth = future_time_period
-        print("Spot Lattice")
-        print(spot_lattice)
+        spot_lattice = BinLattice(new_head_node, depth=future_time_period)
+        return spot_lattice
 
     def __repr__(self) -> str:
         """
@@ -484,7 +485,10 @@ def main():
 
     print("-"*100)
 
-    lattice.construct_zero_spot_lattice(3, p, q)
+    zero_spot_lattice = lattice.construct_zero_spot_lattice(3, p, q)
+
+    print("ZERO SPOT LATTICE")
+    print(zero_spot_lattice)
 
 
 if __name__ == "__main__":
