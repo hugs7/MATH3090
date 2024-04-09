@@ -150,7 +150,7 @@ def strip_test():
 def lattice():
     print("Question 3")
 
-    # Maturity
+    # Maturity (lattice / tree depth)
     T = 3
 
     # zero spot yield rate for time step 0 to time step 1
