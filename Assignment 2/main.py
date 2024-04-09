@@ -1,6 +1,6 @@
 import bond
 import swap
-from lattice import BinNode, Lattice
+from lattice import BinNode, BinLattice
 
 
 def bonds():
@@ -164,11 +164,18 @@ def lattice():
     d = 0.9
 
     head_node = BinNode(y_0_1, 0, None, None, None)
-    zero_spot_lattice = Lattice(head_node)
+    zero_spot_lattice = BinLattice(head_node)
 
     zero_spot_lattice.construct_bin_lattice(u, d, T)
 
     print(zero_spot_lattice)
+
+    print("---")
+
+    path = ["u", "u", "u"]
+
+    rate_value = zero_spot_lattice.get_forward_rate(path)
+    print(f"Rate value at path {path}: {rate_value}")
 
 
 def main():
