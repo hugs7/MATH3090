@@ -10,7 +10,8 @@ def bonds():
     c = 0.08
     F = 100_000
 
-    present_values = bond.present_values_coupon_bearing_bond_discrete(F, T, c, y, n)
+    present_values = bond.present_values_coupon_bearing_bond_discrete(
+        F, T, c, y, n)
 
     print(present_values)
 
@@ -174,7 +175,7 @@ def lattice():
 
     path = ["u", "u", "u"]
 
-    rate_value = zero_spot_lattice.get_forward_rate(path)
+    rate_value = zero_spot_lattice.get_node_by_path(path)
     print(f"Rate value at path {path}: {rate_value}")
 
 

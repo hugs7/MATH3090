@@ -73,10 +73,7 @@ class BinNode(Node):
         self.down = down
 
     def __repr__(self) -> str:
-        if self.down and self.up:
-            return f"({self.value:.4f}, {self.down.get_value():.4f}, {self.up.get_value():.4f})"
-        else:
-            return f"{self.value:.4f}"
+        return f"{self.value:.4f}"
 
     def get_parent(self) -> Union["BinNode", None]:
         return self.parent
@@ -173,7 +170,12 @@ class BinLattice:
         for i in range(depth):
             next_level_nodes = []
 
+            if i == depth - 1:
+                # If we are at the last level, we don't need to create any children
+                break
+
             for parent_node in current_level_nodes:
+
                 down_value = parent_node.get_value() * down_factor
                 up_value = parent_node.get_value() * up_factor
 
@@ -188,9 +190,12 @@ class BinLattice:
             # Reset the current level nodes to the next level nodes
             current_level_nodes = next_level_nodes
 
-    def check_path(self, path: list[str]) -> bool:
+    def check_path(self, path: Union[str, list[str]]) -> bool:
         """
-        Checks a path of a list of strings of 'u' and 'd's.
+        Checks a path of a list of strings or string of 'u' and 'd's.
+
+        Args:
+            path: the path to check as a list of strings or a string
 
         Returns:
             True if the path is valid, False otherwise
@@ -202,14 +207,16 @@ class BinLattice:
 
         return True
 
-    def get_forward_rate(self, path: list[str]) -> float:
+    def get_node_by_path(self, path: Union[str, list[str]]) -> BinNode:
         """
         Get the forward rate given a path (e.g. ['u', 'd', 'u']
-        or ['u', 'u', 'd'], etc.)
+        or "udu", etc.)
 
-        :param path: the path to the forward rate
+        Args:
+            path: the path to check as a list of strings or a string
 
-        :return: the forward rate
+        Returns:
+            The forward rate at the end of the path as BinNode
         """
 
         # Check path
@@ -225,7 +232,7 @@ class BinLattice:
             else:
                 current_node = current_node.get_down()
 
-        rate_value = current_node.get_value()
+        rate_value = current_node
 
         return rate_value
 
