@@ -3,6 +3,8 @@ Helper for computing swap values in contracts / borrowing
 """
 
 import interest
+from typing import List, Tuple
+import table
 
 
 def fixed_payment_continuous_compounding(notional: float, rate: float) -> float:
@@ -99,7 +101,7 @@ def swap_value_at_spot(fixed_payment: float, floating_payment: float, spot_rate:
 
 
 def compute_swap_values(notional: float, maturity_periods: list[int], compounding_frequency_yr: int, spot_rates: list[float], forward_rates: list[float],
-                        fixed_rate: float, floating_spread: float) -> list[float]:
+                        fixed_rate: float, floating_spread: float) -> Tuple[list[float], List, str]:
     """
     Compute the swap values for a list of spot rates and forward rates as well as 
     fixed and floating rates.
@@ -121,14 +123,23 @@ def compute_swap_values(notional: float, maturity_periods: list[int], compoundin
             The floating offset.
 
     Returns:
-        swap_values: list[float]
-            The swap values.
+        Tuple:
+            swap_values: list[float]
+                The swap values.
+            swap_table_data: List
+                The data for the swap table. Columns: $$n$$, $$y_{0,n}$$, $$y_{n-1, n}$$, 
+                                                        Fixed Payment, Floating Payment, 
+                                                        Fixed - Floating, PV @ Spot
+            swap_table_str: str
+                The swap table in markdown format.
     """
 
     swap_values = []
 
     # Compute once as this doesn't change.
     fixed_payment = fixed_payment_continuous_compounding(notional, fixed_rate)
+
+    table_data = []
 
     for k, T in enumerate(maturity_periods):
         spot_rate = spot_rates[k]
@@ -142,4 +153,17 @@ def compute_swap_values(notional: float, maturity_periods: list[int], compoundin
 
         swap_values.append(swap_value)
 
-    return swap_values
+        # Add to table data
+        row = [k+1, T, spot_rate, fixed_payment, floating_payment,
+               fixed_payment - floating_payment, swap_value]
+        table_data.append(row)
+
+    col_heads = ["$$n$$", "$$y_{0,n}$$", "$$y_{n-1, n}$$",
+                 "Fixed Payment", "Floating Payment", "Fixed - Floating", "PV @ Spot"]
+    col_spaces = [3, 6, 6, 10, 15, 12, 10]
+    col_decimals = [0, 4, 4, 0, 3, 3, 3]
+
+    swap_table_str = table.generate_table(
+        col_heads, col_spaces, table_data, col_decimals)
+
+    return swap_values, table_data, swap_table_str
