@@ -127,7 +127,7 @@ def compute_swap_values(notional: float, maturity_periods: list[int], compoundin
             swap_values: list[float]
                 The swap values.
             swap_table_data: List
-                The data for the swap table. Columns: $$n$$, $$y_{0,n}$$, $$y_{n-1, n}$$, 
+                The data for the swap table. Columns: $n$, $y_{0,n}$, $y_{n-1, n}$, 
                                                         Fixed Payment, Floating Payment, 
                                                         Fixed - Floating, PV @ Spot
             swap_table_str: str
@@ -158,7 +158,7 @@ def compute_swap_values(notional: float, maturity_periods: list[int], compoundin
                fixed_payment - floating_payment, swap_value]
         table_data.append(row)
 
-    col_heads = ["$$n$$", "$$y_{0,n}$$", "$$y_{n-1, n}$$",
+    col_heads = ["$n$", "$y_{0,n}$", "$y_{n-1, n}$",
                  "Fixed Payment", "Floating Payment", "Fixed - Floating", "PV @ Spot"]
     col_spaces = [3, 6, 6, 10, 15, 12, 10]
     col_decimals = [0, 4, 4, 0, 3, 3, 3]
