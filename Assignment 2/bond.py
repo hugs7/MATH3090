@@ -440,8 +440,6 @@ def bond_value_at_time(
         # Length of time this coupon can be reinvested for
         reinvestment_time = bond_duration - year
 
-        # print(f"Time step {time_step}, year {year}, reinvestment time {reinvestment_time}, coupon value {coup_val}")
-
         coupon_reinvestment_val = coup_val * interest_adjusted**reinvestment_time
 
         print(
