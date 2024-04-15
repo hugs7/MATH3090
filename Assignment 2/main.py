@@ -13,7 +13,7 @@ def bonds():
     present_values = bond.present_values_coupon_bearing_bond_discrete(
         F, T, c, y, n)
 
-    print(present_values)
+    print("Present values", present_values)
 
     print("The present value of the bond is: ", sum(present_values))
 
@@ -180,13 +180,13 @@ def lattice():
 
 
 def main():
-    # bonds()
+    bonds()
 
     # strip_test()
 
     # swaps()
 
-    lattice()
+    # lattice()
 
 
 if __name__ == "__main__":
