@@ -3,6 +3,7 @@ import swap
 from lattice import BinNode, BinLattice
 import table
 import display as dsp
+from IPython.display import Markdown, display, Latex
 
 
 def bonds():
@@ -125,13 +126,18 @@ def swaps():
     fixed_rate = 0.065
     floating_spread = 0.01
 
-    swap_values = swap.compute_swap_values(
+    swap_values, table_data, swap_table_str = swap.compute_swap_values(
         notional, T, n, spot_rates, forward_rates, fixed_rate, floating_spread
     )
 
     print(f"swap values: {swap_values}")
     print()
 
+    print("-"*100)
+    md_obj = Markdown(swap_table_str)
+    print(md_obj.data)
+    print("-"*100)
+    exit(0)
     sum_swap_values = sum(swap_values)
 
     print(f"sum of swap values: {sum_swap_values}")
@@ -235,7 +241,7 @@ def main():
 
     # strip_test()
 
-    # swaps()
+    swaps()
 
     # lattice()
 
