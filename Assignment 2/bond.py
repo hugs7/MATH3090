@@ -271,7 +271,7 @@ def present_value_coupon_bearing_bond_discrete(
         face_value, coupon_rate, compounding_frequency_yr
     )
 
-    beta = interest.discrete_interest_bond(
+    beta = interest.discrete_compound_interest_discounted_bond(
         interest_rate, time_step, compounding_frequency_yr
     )
     print("Time step", time_step, "Beta", beta)
@@ -424,9 +424,9 @@ def bond_value_at_time(
         raise ValueError("Interest rate must be in the range [0, 1].")
 
     num_time_steps = years_to_maturity * compounding_frequency_yr
-    t_1 = num_time_steps - 1
+    last_cashflow = num_time_steps - 1
 
-    interest_adjusted = 1 + interest_rate
+    # interest_adjusted = 1 + interest_rate
     coup_val = coupon_value(face_value, coupon_rate, compounding_frequency_yr)
     bond_value = 0
 
@@ -434,31 +434,29 @@ def bond_value_at_time(
 
     reinvestments = []
 
-    for time_step in range(1, t_1 + 1):
+    for time_step in range(1, num_time_steps + 1):
         year = time_step / compounding_frequency_yr
 
         # Length of time this coupon can be reinvested for
         reinvestment_time = bond_duration - year
 
-        coupon_reinvestment_val = coup_val * interest_adjusted**reinvestment_time
+        cashflow = coup_val
+        if time_step == num_time_steps:
+            # Last coupon includes face value
+            cashflow += float(face_value)
+
+        beta = interest.discrete_compound_interest_accumulated_bond(
+            interest_rate, reinvestment_time, compounding_frequency_yr)
+        coupon_reinvestment_val = cashflow * beta
 
         print(
-            f"Time step {time_step:<1}, Year {year:<1}, Reinvestment value {coupon_reinvestment_val:<9.4f}")
+            f"Time step {time_step:<1}, Year {year:<1}, Cashflow: {cashflow:>8}, Beta:" +
+            f"{beta:>8.4f}, Reinvestment value {coupon_reinvestment_val:>9.4f}")
 
         reinvestments.append(coupon_reinvestment_val)
 
-    # Last coupon (including face value)
-
-    # B
-    last_coupon_reinvestment_val = (face_value + coup_val) / (
-        interest_adjusted ** (years_to_maturity - bond_duration)
-    )
-
-    print(
-        f"Time step {t_1 + 1:<1}, Year {years_to_maturity:<1.1f}, Reinvestment value {last_coupon_reinvestment_val:<9.4f}")
-
     print("-"*50)
-    reinvestments.append(last_coupon_reinvestment_val)
+
     bond_value = sum(reinvestments)
 
     return bond_value
@@ -675,7 +673,7 @@ def recursive_zero_coupon_yield_continuous(
 
 def price_zero_coupon_bond_leaf(forward_rate: float) -> float:
     """
-    Computes the price of a zero coupon bond with F = $1 
+    Computes the price of a zero coupon bond with F = $1
     given a forward rate.
 
     E.g. returns y_{0, 4} given y_{3, 4}

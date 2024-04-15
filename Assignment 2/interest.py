@@ -52,7 +52,30 @@ def discrete_compound_interest_discounted(interest_rate: float, maturity_yrs: in
     return beta
 
 
-def discrete_interest_bond(interest_rate: float, time_step: int, compounding_frequency_yr: int):
+def discrete_compound_interest_accumulated_bond(interest_rate: float, time_step: int, compounding_frequency_yr: int):
+    """
+    Calculate the accumulated ratio of a bond with discrete interest.
+
+    Args:
+        interest_rate: float
+            The interest rate.
+        time_step: int
+            The time step.
+        compounding_frequency_yr: int
+            The frequency at which the interest is compounded.
+
+    Returns:
+        bond_accumulated: float
+            The accumulated ratio of the bond.
+    """
+
+    bond_accumulated = (1 + interest_rate /
+                        compounding_frequency_yr) ** (time_step)
+
+    return bond_accumulated
+
+
+def discrete_compound_interest_discounted_bond(interest_rate: float, time_step: int, compounding_frequency_yr: int):
     """
     Calculate the interest rate for a bond with discrete interest.
 
