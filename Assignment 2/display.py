@@ -3,6 +3,7 @@ Helper for dislaying things on the screen
 """
 
 from colorama import Fore, Style
+from IPython.display import Markdown, display
 
 
 def display_question(question_number: int, question_text: str):
@@ -33,3 +34,7 @@ def display_answer(
 
     print(f"{Fore.GREEN}Answer:{Style.RESET_ALL}", end=" ")
     print(f'{"$" if dollar_value else ""}{round(answer_value, decimal_places)}')
+
+
+def printmd(string):
+    display(Markdown(string))
