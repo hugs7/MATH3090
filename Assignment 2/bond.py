@@ -274,7 +274,7 @@ def present_value_coupon_bearing_bond_discrete(
     beta = interest.discrete_interest_bond(
         interest_rate, time_step, compounding_frequency_yr
     )
-
+    print("Time step", time_step, "Beta", beta)
     if time_step < num_time_steps:
         return adjusted_coupon_value * beta
     else:
@@ -439,10 +439,13 @@ def bond_value_at_time(
 
         # Length of time this coupon can be reinvested for
         reinvestment_time = bond_duration - year
-        print(
-            f"Time step {time_step}, year {year}, reinvestment time {reinvestment_time}, coupon value {coup_val}"
-        )
+
+        # print(f"Time step {time_step}, year {year}, reinvestment time {reinvestment_time}, coupon value {coup_val}")
+
         coupon_reinvestment_val = coup_val * interest_adjusted**reinvestment_time
+
+        print(
+            f"Time step {time_step:<1}, Year {year:<1}, Reinvestment value {coupon_reinvestment_val:<9.4f}")
 
         reinvestments.append(coupon_reinvestment_val)
 
@@ -453,8 +456,11 @@ def bond_value_at_time(
         interest_adjusted ** (years_to_maturity - bond_duration)
     )
 
+    print(
+        f"Time step {t_1 + 1:<1}, Year {years_to_maturity:<1.1f}, Reinvestment value {last_coupon_reinvestment_val:<9.4f}")
+
+    print("-"*50)
     reinvestments.append(last_coupon_reinvestment_val)
-    print(reinvestments)
     bond_value = sum(reinvestments)
 
     return bond_value
