@@ -153,9 +153,11 @@ def compute_swap_values(notional: float, maturity_periods: list[int], compoundin
 
         swap_values.append(swap_value)
 
+        fix_float = fix_float_delta(fixed_payment, floating_payment)
+
         # Add to table data
-        row = [k+1, T, spot_rate, fixed_payment, floating_payment,
-               fixed_payment - floating_payment, swap_value]
+        row = [T, spot_rate, forward_rate, fixed_payment, floating_payment,
+               fix_float, swap_value]
         table_data.append(row)
 
     col_heads = ["$n$", "$y_{0,n}$", "$y_{n-1, n}$",
