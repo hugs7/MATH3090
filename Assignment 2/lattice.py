@@ -97,6 +97,17 @@ class BinNode(Node):
     def __repr__(self) -> str:
         return f"{self.value:.5f}"
 
+    def __copy__(self) -> "BinNode":
+        node_value_copy = self.value
+        node_depth_copy = self.depth
+        node_up_copy = self.up.__copy__() if self.up is not None else None
+        node_down_copy = self.down.__copy__() if self.down is not None else None
+
+        node_copy = BinNode(
+            node_value_copy, node_depth_copy, None, node_up_copy, node_down_copy)
+
+        return node_copy
+
     def get_parent(self) -> Union["BinNode", None]:
         return self.parent
 
@@ -172,6 +183,16 @@ class BinLattice:
     def get_head_node(self) -> BinNode:
         return self.head_node
 
+    def get_depth(self) -> int:
+        """
+        Get the depth of the lattice
+
+        Returns:
+            The depth of the lattice
+        """
+
+        return self.depth
+
     def get_nodes_at_depth(self, depth: int) -> list[BinNode]:
         """
         Get all nodes at a certain depth
@@ -203,6 +224,20 @@ class BinLattice:
             nodes = new_nodes
 
         return nodes
+
+    @staticmethod
+    def get_num_nodes_at_depth(depth: int) -> int:
+        """
+        Get the number of nodes at a certain depth
+
+        Args:
+            depth: the depth to get the number of nodes at, indexed from 0
+
+        Returns:
+            The number of nodes at the specified depth
+        """
+
+        return 2 ** depth
 
     def construct_bin_lattice(
         self, up_factor: float, down_factor: float, depth: int
@@ -311,7 +346,7 @@ class BinLattice:
         Gets a subtree of the lattice with a certain depth
 
         Args:
-            depth: the depth of the subtree
+            depth: the depth of the subtree indexed from 0
 
         Returns:
             A new lattice with the subtree
@@ -356,51 +391,73 @@ class BinLattice:
             return None
 
         # Get subtree of the lattice up to the forward time period
-        lattice_subtree = self.get_lattice_subtree(future_time_period)
+        leaf = future_time_period - 1
+        lattice_subtree = self.get_lattice_subtree(leaf)
 
         print(f"lattice_subtree: \n{lattice_subtree}")
 
-        # Construct new lattice bottom up, (i.e. starting at leaf nodes)
+        # Construct new lattice bottom up just by replacing the values of the nodes
+        # as we go
 
-        depth = future_time_period
+        # First take a copy of the subtree
+        p_lattice = lattice_subtree.__copy__()
+        # At this stage the lattice is still the forward lattice and
+        # below it will be converted to the p lattice
+
+        depth = leaf
+        print("Initial depth: ", depth)
 
         while depth >= 0:
-            current_nodes = lattice_subtree.get_nodes_at_depth(depth)
-            if depth == future_time_period:
-                # Leaf case - default child nodes to 1s
-                child_nodes = [1 for _ in range(len(current_nodes))]
+            if depth == leaf:
+                # Leaf case
+                # All 1s for the first level of the p lattice
+                p_lattice_prev_level_nodes = [
+                    1 for _ in range(BinLattice.get_num_nodes_at_depth(depth))]
             else:
-                child_nodes = lattice_subtree.get_nodes_at_depth(depth + 1)
+                # Recursive case
+                # Get the previous level of the p lattice
+                p_lattice_prev_level_nodes = p_lattice.get_nodes_at_depth(
+                    depth + 1)
 
-            new_nodes: List[BinNode] = []
+            # Get nodes at current level from forward lattice
+            forward_lattice_nodes = lattice_subtree.get_nodes_at_depth(depth)
 
-            for i, child_node in enumerate(current_nodes):
-                forward_rate = child_node.get_value()
+            for i, forward_node in enumerate(forward_lattice_nodes):
+                forward_rate = forward_node.get_value()
 
-                if depth == future_time_period:
+                if depth == leaf:
                     # Leaf case
                     # Compute their zero coupon bond price
                     bond_price = bond.price_zero_coupon_bond_leaf(
                         forward_rate)
+                    print(
+                        f"forward_rate: {forward_rate} => bond_price: {bond_price}")
+
+                    p_up_node = None
+                    p_down_node = None
                 else:
                     # Non-leaf case
                     # zero coupon bond price is the expected value of the two child nodes
-                    up_rate = child_node.get_up().get_value()
-                    down_rate = child_node.get_down().get_value()
+                    p_up_node = p_lattice_prev_level_nodes[i]
+                    p_down_node = p_lattice_prev_level_nodes[i + 1]
+
+                    p_up_rate = p_up_node.get_value()
+                    p_down_rate = p_down_node.get_value(
+                    )
 
                     bond_price = bond.price_zero_coupon_bond_non_leaf(
-                        forward_rate, up_rate, down_rate, up_pr, down_pr)
-
-                if depth == future_time_period:
-                    up_child = None
-                    down_child = None
-                else:
-                    up_child = child_nodes[i]
-                    down_child = child_nodes[i + 1]
-
+                        forward_rate, p_up_rate, p_down_rate, up_pr, down_pr)
+                    print(
+                        f"forward_rate: {forward_rate} => bond_price: {bond_price}")
                 new_node = BinNode(bond_price, depth, None,
-                                   up_child, down_child)
-                new_nodes.append(new_node)
+                                   p_up_node, p_down_node)
+
+                # Update the p lattice with the newly computed node (p value)
+                # print(
+                #     f"{Fore.LIGHTRED_EX}p lattice before{Style.RESET_ALL}\n", p_lattice)
+                p_lattice.set_node_at_depth_and_index(depth, i, new_node)
+                # print(f"{Fore.LIGHTRED_EX}p lattice after{Style.RESET_ALL}\n",
+                #       p_lattice, "\nnew node", new_node)
 
             # Move to the next level up in the lattice
             depth -= 1
@@ -408,15 +465,58 @@ class BinLattice:
         # At this point, new_nodes should contain only the head node
         # of the new lattice
 
-        if len(new_nodes) != 1:
+        return p_lattice
+
+    def set_node_at_depth_and_index(self, depth: int, index: int, node: BinNode) -> None:
+        """
+        Set a node at a certain depth and index
+
+        Args:
+            depth: the depth to set the node at, indexed from 0
+            index: the index to set the node at, indexed from 0
+            node: the node to set
+
+        Returns:
+            None
+        """
+
+        if depth < 0 or depth > self.depth:
             print(
-                f"{Fore.RED}Error: Expected 1 node, got {len(new_nodes)}{Style.RESET_ALL}")
-            return None
+                f"{Fore.RED}Invalid depth. Depth must be in the range [0, {self.depth}].{Style.RESET_ALL}")
+            return
 
-        new_head_node = new_nodes[0]
+        if index < 0 or index >= BinLattice.get_num_nodes_at_depth(depth):
+            print(
+                f"{Fore.RED}Invalid index. Index must be in the range [0, {BinLattice.get_num_nodes_at_depth(depth)}).{Style.RESET_ALL}")
+            return
 
-        spot_lattice = BinLattice(new_head_node, depth=future_time_period)
-        return spot_lattice
+        nodes = self.get_nodes_at_depth(depth)
+        print("nodes", nodes)
+        # Update this node's parent's children
+        parent = nodes[index].get_parent()
+        if parent is not None:
+            # Determine if this node is the up or down child of the parent
+            if parent.get_up() == nodes[index]:
+                parent.set_up(node)
+            else:
+                parent.set_down(node)
+        else:
+            # We are updating the head node
+            self.head_node = node
+
+    def __copy__(self) -> "BinLattice":
+        """
+        Copy the lattice
+
+        Returns:
+            A copy of the lattice
+        """
+
+        head_node_copy = self.head_node.__copy__()
+
+        lattice_copy = BinLattice(head_node_copy, depth=self.depth)
+
+        return lattice_copy
 
     def __repr__(self) -> str:
         """
