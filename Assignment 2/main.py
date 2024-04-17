@@ -108,6 +108,7 @@ def swaps():
     ]
 
     num_bonds = 20
+    assert (len(bond_prices) == num_bonds)
     F = 100_000
     c = 0.04
     n = 1  # annual
@@ -117,70 +118,22 @@ def swaps():
         bond_prices, F, T, c, n
     )
 
-    print(f"spot: {spot_rates}")
-    print()
-    print(f"forward: {forward_rates}")
-    print()
+    col_heads = ["Time Step", "Year", "Spot Rate", "Forward Rate"]
+    col_spaces = [10, 6, 11, 14]
+    col_decimals = [None, None, 5, 5]
 
-    notional = 1_000_000
-    fixed_rate = 0.065
-    floating_spread = 0.01
+    table_data = []
 
-    swap_values, table_data, swap_table_str = swap.compute_swap_values(
-        notional, T, n, spot_rates, forward_rates, fixed_rate, floating_spread
-    )
+    for i in range(len(T)):
+        table_data.append([i+1, T[i], spot_rates[i], forward_rates[i]])
 
-    print(f"swap values: {swap_values}")
-    print()
+    table_str = table.generate_table(
+        col_heads, col_spaces, table_data, col_decimals)
 
-    print("-"*100)
-    md_obj = Markdown(swap_table_str)
-    print(md_obj.data)
-    print("-"*100)
-    exit(0)
-    sum_swap_values = sum(swap_values)
-
-    print(f"sum of swap values: {sum_swap_values}")
-
-    lb = 0.06
-    ub = 0.07
-    itv = 0.001
-
-    eps = 10
-    closest_sum_swap = None
-    closest_fixed_rate = None
-
-    while closest_sum_swap is None or closest_sum_swap > eps:
-        fixed_rates = [lb + itv * k for k in range(int((ub - lb) / itv) + 1)]
-
-        sum_swap_rates = []
-        for fixed_rate in fixed_rates:
-            swap_values = swap.compute_swap_values(
-                notional, T, n, spot_rates, forward_rates, fixed_rate, floating_spread
-            )
-            sum_swap_values = sum(swap_values)
-
-            sum_swap_rates.append(sum_swap_values)
-
-        closest_index = -1
-        for i, sum_swap in enumerate(sum_swap_rates):
-            if closest_sum_swap is None or abs(sum_swap) < closest_sum_swap:
-                closest_sum_swap = abs(sum_swap)
-                closest_fixed_rate = fixed_rates[i]
-                closest_index = i
-
-        if closest_index >= 0:
-            # if we didn't find a better rate, we need to make the interval more granular
-            lb = fixed_rates[closest_index - 1]
-            ub = fixed_rates[closest_index + 1]
-        itv /= 2
-        print(
-            f"fixed rate: {closest_fixed_rate}, sum of swap values: {closest_sum_swap}"
-        )
-
-    print(
-        f"FOUND: closest rate: {closest_fixed_rate}, sum of swap values: {closest_sum_swap}"
-    )
+    print("Spot rates")
+    print(spot_rates)
+    print("\n\nForward rates")
+    print(forward_rates)
 
 
 def strip_test():
