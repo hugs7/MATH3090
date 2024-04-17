@@ -687,9 +687,9 @@ def price_zero_coupon_bond_leaf(forward_rate: float) -> float:
             The zero coupon yield.
     """
 
-    spot_price = 1 / (1 + forward_rate)
+    p_price = 1 / (1 + forward_rate)
 
-    return spot_price
+    return p_price
 
 
 def price_zero_coupon_bond_non_leaf(forward_rate: float, up_rate: float, down_rate: float, up_pr: float, down_pr: float) -> float:
@@ -712,11 +712,15 @@ def price_zero_coupon_bond_non_leaf(forward_rate: float, up_rate: float, down_ra
 
     Returns:
         zero_coupon_yield: float
-            The zero coupon yield.
+            The zero coupon yield, i.e. p{.,.}.
     """
 
-    spot_factor_price = price_zero_coupon_bond_leaf(forward_rate)
+    p_factor_price = price_zero_coupon_bond_leaf(forward_rate)
+    # print("p factor price", p_factor_price)
+    expectation = up_pr * up_rate + down_pr * down_rate
+    # print(
+    #     f"Expectation: {up_pr} * {up_rate} + {down_pr} * {down_rate} = {expectation}")
+    p_price = p_factor_price * expectation
+    # print("p price", p_price)
 
-    spot_price = spot_factor_price * (up_pr * up_rate + down_pr * down_rate)
-
-    return spot_price
+    return p_price
