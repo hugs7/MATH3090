@@ -747,9 +747,7 @@ def spot_rate_from_p_lattice(p_lattice: BinLattice) -> float:
 
     head_node = p_lattice.get_head_node()
     p_value = head_node.get_value()
-    print("P value", p_value)
 
     # Add 1 to depth as (e.g. a) tree depth of 1 would be P_{0,2}
     maturity = p_lattice.get_depth() + 1
-    print("Maturity", maturity)
     return spot_rate_from_present_rate(p_value, maturity)
