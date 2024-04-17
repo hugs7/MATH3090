@@ -366,9 +366,9 @@ class BinLattice:
 
         return lattice_copy
 
-    def construct_zero_spot_lattice(self, future_time_period: int, up_pr: float, down_pr: float) -> "BinLattice":
+    def construct_p_lattice(self, future_time_period: int, up_pr: float, down_pr: float) -> "BinLattice":
         """
-        Constructs a new lattice such that the head node is y_{0, future_time_period} 
+        Constructs a new lattice such that the head node is P_{0, future_time_period} 
         with the forward rates given the current lattice of zero spot rates
 
         Args:
@@ -382,7 +382,7 @@ class BinLattice:
                 The probability of a down move within the binomial model
 
         Returns:
-            A new lattice with forward rates
+            A new lattice with P values
         """
 
         if future_time_period < 0 or future_time_period > self.depth:
@@ -424,12 +424,11 @@ class BinLattice:
                 forward_rate = forward_node.get_value()
 
                 # zero coupon bond price is the expected value of the two child nodes
-                p_up_node = p_lattice_prev_level_nodes[i]
-                p_down_node = p_lattice_prev_level_nodes[i + 1]
+                p_down_node = p_lattice_prev_level_nodes[i]
+                p_up_node = p_lattice_prev_level_nodes[i + 1]
 
+                p_down_rate = p_down_node.get_value()
                 p_up_rate = p_up_node.get_value()
-                p_down_rate = p_down_node.get_value(
-                )
 
                 bond_price = bond.price_zero_coupon_bond(
                     forward_rate, p_up_rate, p_down_rate, up_pr, down_pr)
@@ -566,7 +565,7 @@ def main():
 
     print("-"*100)
 
-    zero_spot_lattice = lattice.construct_zero_spot_lattice(3, p, q)
+    zero_spot_lattice = lattice.construct_p_lattice(3, p, q)
 
     print("ZERO SPOT LATTICE")
     print(zero_spot_lattice)
