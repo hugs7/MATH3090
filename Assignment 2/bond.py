@@ -4,6 +4,7 @@
 
 import math
 import interest
+from lattice import BinLattice
 
 # ----- Zero Coupon Bonds -----
 
@@ -703,3 +704,52 @@ def price_zero_coupon_bond(forward_rate: float, up_rate: float, down_rate: float
     # print("p price", p_price)
 
     return p_price
+
+
+def spot_rate_from_present_rate(present_rate: float, end_time: float) -> float:
+    """
+    Computes the spot rate from the present rate, P_{0,n}
+
+    Args:
+        present_rate: float
+            The present rate.
+        end_time: float
+            The end time, n.
+
+    Returns:
+        spot_rate: float
+            The spot rate, y_{0,n}.
+    """
+
+    if present_rate <= 0:
+        raise ValueError("Present rate must be strictly positive.")
+
+    if end_time <= 0:
+        raise ValueError("End time must be strictly positive.")
+
+    fraction = 1 / present_rate
+
+    return fraction ** (1 / end_time) - 1
+
+
+def spot_rate_from_p_lattice(p_lattice: BinLattice) -> float:
+    """
+    Computes the spot rate from a P lattice.
+
+    Args:
+        p_lattice: BinLattice
+            The P lattice.
+
+    Returns:
+        spot_rate: float
+            The spot rate.
+    """
+
+    head_node = p_lattice.get_head_node()
+    p_value = head_node.get_value()
+    print("P value", p_value)
+
+    # Add 1 to depth as (e.g. a) tree depth of 1 would be P_{0,2}
+    maturity = p_lattice.get_depth() + 1
+    print("Maturity", maturity)
+    return spot_rate_from_present_rate(p_value, maturity)
