@@ -4,6 +4,7 @@ from lattice import BinNode, BinLattice
 import table
 import display as dsp
 from IPython.display import Markdown, display, Latex
+from colorama import Fore, Style
 
 
 def bonds():
@@ -160,7 +161,7 @@ def strip_test():
 def lattice():
     print("Question 3")
 
-    # Maturity (lattice / tree depth)
+    # Maturity
     T = 3
 
     # zero spot yield rate for time step 0 to time step 1
@@ -179,14 +180,33 @@ def lattice():
 
     forward_lattice.construct_bin_lattice(u, d, T)
 
+    print(f"{Fore.GREEN}Forward lattice{Style.RESET_ALL}")
     print(forward_lattice)
 
-    print("---")
-
-    path = ["u", "u", "u"]
+    # Week 4 lecture 2
+    path = ["u", "u"]
 
     rate_value = forward_lattice.get_node_by_path(path)
     print(f"Rate value at path {path}: {rate_value}")
+
+    # Yield curve lattice
+    print(f"{Fore.LIGHTMAGENTA_EX}Yield curve lattice{Style.RESET_ALL}")
+    # y_{0, 2}
+    T_y = 2
+    yield_curve_lattice = forward_lattice.construct_zero_spot_lattice(
+        T_y, p, q)
+
+    print(f"{Fore.GREEN}y_{0, 2} yield curve lattice{Style.RESET_ALL}")
+    print(yield_curve_lattice)
+    # print(yield_curve_lattice.get_depth())
+    print("----------------------------------")
+    # y_{0, 3}
+    # T_y = 3
+    # yield_curve_lattice = forward_lattice.construct_zero_spot_lattice(
+    #    T_y, p, q)
+
+    # print(f"{Fore.GREEN}y_{0, 3} yield curve lattice{Style.RESET_ALL}")
+    # print(yield_curve_lattice)
 
 
 def main():
@@ -194,9 +214,9 @@ def main():
 
     # strip_test()
 
-    swaps()
+    # swaps()
 
-    # lattice()
+    lattice()
 
 
 if __name__ == "__main__":
