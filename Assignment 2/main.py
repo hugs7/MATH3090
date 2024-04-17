@@ -193,20 +193,23 @@ def lattice():
     print(f"{Fore.LIGHTMAGENTA_EX}Yield curve lattice{Style.RESET_ALL}")
     # y_{0, 2}
     T_y = 2
-    yield_curve_lattice = forward_lattice.construct_zero_spot_lattice(
+    p_lattice = forward_lattice.construct_p_lattice(
         T_y, p, q)
 
-    print(f"{Fore.GREEN}y_{0, 2} yield curve lattice{Style.RESET_ALL}")
-    print(yield_curve_lattice)
-    # print(yield_curve_lattice.get_depth())
+    print(f"{Fore.GREEN}y_{0, 2} P lattice{Style.RESET_ALL}")
+    print(p_lattice)
+    spot_rate = bond.spot_rate_from_p_lattice(p_lattice)
+    print(f"{Fore.LIGHTCYAN_EX}Spot rate: {spot_rate}{Style.RESET_ALL}")
     print("----------------------------------")
     # y_{0, 3}
-    # T_y = 3
-    # yield_curve_lattice = forward_lattice.construct_zero_spot_lattice(
-    #    T_y, p, q)
+    T_y = 3
+    p_lattice = forward_lattice.construct_p_lattice(
+        T_y, p, q)
 
-    # print(f"{Fore.GREEN}y_{0, 3} yield curve lattice{Style.RESET_ALL}")
-    # print(yield_curve_lattice)
+    print(f"{Fore.GREEN}y_{0, 3} P lattice{Style.RESET_ALL}")
+    print(p_lattice)
+    spot_rate = bond.spot_rate_from_p_lattice(p_lattice)
+    print(f"{Fore.LIGHTCYAN_EX}Spot rate: {spot_rate}{Style.RESET_ALL}")
 
 
 def main():
