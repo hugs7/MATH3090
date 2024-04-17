@@ -671,28 +671,7 @@ def recursive_zero_coupon_yield_continuous(
     return spot_rates, forward_rates
 
 
-def price_zero_coupon_bond_leaf(forward_rate: float) -> float:
-    """
-    Computes the price of a zero coupon bond with F = $1
-    given a forward rate.
-
-    E.g. returns y_{0, 4} given y_{3, 4}
-
-    Args:
-        forward_rate: float
-            The forward rate.
-
-    Returns:
-        zero_coupon_yield: float
-            The zero coupon yield.
-    """
-
-    p_price = 1 / (1 + forward_rate)
-
-    return p_price
-
-
-def price_zero_coupon_bond_non_leaf(forward_rate: float, up_rate: float, down_rate: float, up_pr: float, down_pr: float) -> float:
+def price_zero_coupon_bond(forward_rate: float, up_rate: float, down_rate: float, up_pr: float, down_pr: float) -> float:
     """
     Computes the price of a zero coupon bond with F = $1
     given a forward rate assuming a binomial model where the forward rate
@@ -715,7 +694,7 @@ def price_zero_coupon_bond_non_leaf(forward_rate: float, up_rate: float, down_ra
             The zero coupon yield, i.e. p{.,.}.
     """
 
-    p_factor_price = price_zero_coupon_bond_leaf(forward_rate)
+    p_factor_price = 1 / (1 + forward_rate)
     # print("p factor price", p_factor_price)
     expectation = up_pr * up_rate + down_pr * down_rate
     # print(

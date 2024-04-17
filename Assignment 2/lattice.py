@@ -394,8 +394,6 @@ class BinLattice:
         leaf = future_time_period - 1
         lattice_subtree = self.get_lattice_subtree(leaf)
 
-        print(f"lattice_subtree: \n{lattice_subtree}")
-
         # Construct new lattice bottom up just by replacing the values of the nodes
         # as we go
 
@@ -405,14 +403,14 @@ class BinLattice:
         # below it will be converted to the p lattice
 
         depth = leaf
-        print("Initial depth: ", depth)
 
         while depth >= 0:
             if depth == leaf:
                 # Leaf case
                 # All 1s for the first level of the p lattice
+                leaf_num_nodes = BinLattice.get_num_nodes_at_depth(depth+1)
                 p_lattice_prev_level_nodes = [
-                    1 for _ in range(BinLattice.get_num_nodes_at_depth(depth))]
+                    BinNode(1, leaf, None, None, None) for _ in range(leaf_num_nodes)]
             else:
                 # Recursive case
                 # Get the previous level of the p lattice
@@ -425,39 +423,22 @@ class BinLattice:
             for i, forward_node in enumerate(forward_lattice_nodes):
                 forward_rate = forward_node.get_value()
 
-                if depth == leaf:
-                    # Leaf case
-                    # Compute their zero coupon bond price
-                    bond_price = bond.price_zero_coupon_bond_leaf(
-                        forward_rate)
-                    print(
-                        f"forward_rate: {forward_rate} => bond_price: {bond_price}")
+                # zero coupon bond price is the expected value of the two child nodes
+                p_up_node = p_lattice_prev_level_nodes[i]
+                p_down_node = p_lattice_prev_level_nodes[i + 1]
 
-                    p_up_node = None
-                    p_down_node = None
-                else:
-                    # Non-leaf case
-                    # zero coupon bond price is the expected value of the two child nodes
-                    p_up_node = p_lattice_prev_level_nodes[i]
-                    p_down_node = p_lattice_prev_level_nodes[i + 1]
+                p_up_rate = p_up_node.get_value()
+                p_down_rate = p_down_node.get_value(
+                )
 
-                    p_up_rate = p_up_node.get_value()
-                    p_down_rate = p_down_node.get_value(
-                    )
+                bond_price = bond.price_zero_coupon_bond(
+                    forward_rate, p_up_rate, p_down_rate, up_pr, down_pr)
 
-                    bond_price = bond.price_zero_coupon_bond_non_leaf(
-                        forward_rate, p_up_rate, p_down_rate, up_pr, down_pr)
-                    print(
-                        f"forward_rate: {forward_rate} => bond_price: {bond_price}")
                 new_node = BinNode(bond_price, depth, None,
                                    p_up_node, p_down_node)
 
                 # Update the p lattice with the newly computed node (p value)
-                # print(
-                #     f"{Fore.LIGHTRED_EX}p lattice before{Style.RESET_ALL}\n", p_lattice)
                 p_lattice.set_node_at_depth_and_index(depth, i, new_node)
-                # print(f"{Fore.LIGHTRED_EX}p lattice after{Style.RESET_ALL}\n",
-                #       p_lattice, "\nnew node", new_node)
 
             # Move to the next level up in the lattice
             depth -= 1
@@ -491,7 +472,7 @@ class BinLattice:
             return
 
         nodes = self.get_nodes_at_depth(depth)
-        print("nodes", nodes)
+
         # Update this node's parent's children
         parent = nodes[index].get_parent()
         if parent is not None:
