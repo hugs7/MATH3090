@@ -200,3 +200,27 @@ def nonconstant_yield_discounted(yield_function: callable, maturity_yrs: int):
     beta = math.exp(-int_val)
 
     return beta
+
+
+def zero_coupon_forward_rate_discrete(y_0_j: float, y_0_k: float, t_j: float, t_k: float):
+    """
+    Calculate the zero coupon forward rate for discrete interest.
+
+    Args:
+        y_0_j: float
+            The zero coupon yield at time t_j.
+        y_0_k: float
+            The zero coupon yield at time t_k.
+        t_j: float
+            The time at which the yield is calculated.
+        t_k: float
+            The time at which the yield is calculated.
+
+    Returns:
+        y_j_k: float
+            The zero coupon forward rate.
+    """
+
+    y_j_k = ((1 + y_0_k) ** t_k / (1 + y_0_j) ** t_j) ** (1 / (t_k - t_j)) - 1
+
+    return y_j_k
