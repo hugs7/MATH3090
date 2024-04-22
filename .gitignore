@@ -17,3 +17,6 @@
 
 # Jupyter Notebook
 .ipynb_checkpoints
+
+# tex aux files
+**/tex-aux
