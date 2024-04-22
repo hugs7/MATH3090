@@ -225,8 +225,7 @@ def coupon_value(
             The value of the coupon payment.
     """
 
-    adjusted_coup_rate = adjusted_coupon_rate(
-        coupon_rate, compounding_frequency_yr)
+    adjusted_coup_rate = adjusted_coupon_rate(coupon_rate, compounding_frequency_yr)
 
     coupon_value = face_value * adjusted_coup_rate
 
@@ -275,7 +274,7 @@ def present_value_coupon_bearing_bond_discrete(
     beta = interest.discrete_compound_interest_discounted_bond(
         interest_rate, time_step, compounding_frequency_yr
     )
-    print("Time step", time_step, "Beta", beta)
+
     if time_step < num_time_steps:
         return adjusted_coupon_value * beta
     else:
@@ -415,8 +414,7 @@ def bond_value_at_time(
     """
 
     if bond_duration < 0 or bond_duration > years_to_maturity:
-        raise ValueError(
-            "Bond duration must be in the range [0, years_to_maturity].")
+        raise ValueError("Bond duration must be in the range [0, years_to_maturity].")
 
     if compounding_frequency_yr < 1:
         raise ValueError("Compounding frequency must be a positive integer.")
@@ -425,7 +423,6 @@ def bond_value_at_time(
         raise ValueError("Interest rate must be in the range [0, 1].")
 
     num_time_steps = years_to_maturity * compounding_frequency_yr
-    last_cashflow = num_time_steps - 1
 
     # interest_adjusted = 1 + interest_rate
     coup_val = coupon_value(face_value, coupon_rate, compounding_frequency_yr)
@@ -447,16 +444,18 @@ def bond_value_at_time(
             cashflow += float(face_value)
 
         beta = interest.discrete_compound_interest_accumulated_bond(
-            interest_rate, reinvestment_time, compounding_frequency_yr)
+            interest_rate, reinvestment_time, compounding_frequency_yr
+        )
         coupon_reinvestment_val = cashflow * beta
 
         print(
-            f"Time step {time_step:<1}, Year {year:<1}, Cashflow: {cashflow:>8}, Beta:" +
-            f"{beta:>8.4f}, Reinvestment value {coupon_reinvestment_val:>9.4f}")
+            f"Time step {time_step:<1}, Year {year:<1}, Cashflow: {cashflow:>8}, Beta:"
+            + f"{beta:>8.4f}, Reinvestment value {coupon_reinvestment_val:>9.4f}"
+        )
 
         reinvestments.append(coupon_reinvestment_val)
 
-    print("-"*50)
+    print("-" * 50)
 
     bond_value = sum(reinvestments)
 
@@ -473,7 +472,7 @@ def spot_zero_coupon_yield_curve_continuous(
     spot_rates: list[float],
     coupon_rate: float,
     compounding_frequency_yr: int,
-    checks: bool = True
+    checks: bool = True,
 ) -> float:
     """
     Computes the spot yield curve for a zero coupon bond using continuous compound interest.
@@ -503,8 +502,7 @@ def spot_zero_coupon_yield_curve_continuous(
             raise ValueError("Years to maturity must be non-negative.")
 
         if compounding_frequency_yr < 1:
-            raise ValueError(
-                "Compounding frequency must be a positive integer.")
+            raise ValueError("Compounding frequency must be a positive integer.")
 
         if any(rate < 0 for rate in spot_rates):
             raise ValueError("Spot rates must be non-negative.")
@@ -545,7 +543,7 @@ def forward_rate_continuous(
     time_k: float,
     spot_rate_0_j: float,
     spot_rate_0_k: float,
-    checks: bool = True
+    checks: bool = True,
 ) -> float:
     """
     Calculate the forward rate between two time periods.
@@ -577,11 +575,11 @@ def forward_rate_continuous(
 
         if spot_rate_0_j > spot_rate_0_k:
             raise ValueError(
-                "Spot rate at time period j must be less than spot rate at time period k. " +
-                "This would otherwise cause a negative forward rate!")
+                "Spot rate at time period j must be less than spot rate at time period k. "
+                + "This would otherwise cause a negative forward rate!"
+            )
 
-    forward_rate = (spot_rate_0_k * time_k - spot_rate_0_j *
-                    time_j) / (time_k - time_j)
+    forward_rate = (spot_rate_0_k * time_k - spot_rate_0_j * time_j) / (time_k - time_j)
 
     return forward_rate
 
@@ -592,7 +590,7 @@ def recursive_zero_coupon_yield_continuous(
     maturity_periods: list[int],
     coupon_rate: float,
     compounding_frequency_yr: int,
-    checks: bool = True
+    checks: bool = True,
 ) -> tuple[list[float], list[float]]:
     """
     Calculates the one-period forward rates (recursively) given prices of coupon bearing bonds.
@@ -620,11 +618,11 @@ def recursive_zero_coupon_yield_continuous(
         # Check lengths of input lists
         if len(coupon_bond_prices) != len(maturity_periods):
             raise ValueError(
-                "The number of bond prices must equal the number of maturity periods.")
+                "The number of bond prices must equal the number of maturity periods."
+            )
 
         if compounding_frequency_yr < 1:
-            raise ValueError(
-                "Compounding frequency must be a positive integer.")
+            raise ValueError("Compounding frequency must be a positive integer.")
 
         if any(price < 0 for price in coupon_bond_prices):
             raise ValueError("Bond prices must be non-negative.")
@@ -661,7 +659,11 @@ def recursive_zero_coupon_yield_continuous(
             prev_spot_rate = spot_rates[-2]
             current_spot_rate = spot_rates[-1]
             y_k_1_k = forward_rate_continuous(
-                prev_period, years_to_maturity, prev_spot_rate, current_spot_rate, checks=False
+                prev_period,
+                years_to_maturity,
+                prev_spot_rate,
+                current_spot_rate,
+                checks=False,
             )
 
             forward_rates.append(y_k_1_k)
@@ -672,7 +674,9 @@ def recursive_zero_coupon_yield_continuous(
     return spot_rates, forward_rates
 
 
-def price_zero_coupon_bond(forward_rate: float, up_rate: float, down_rate: float, up_pr: float, down_pr: float) -> float:
+def price_zero_coupon_bond(
+    forward_rate: float, up_rate: float, down_rate: float, up_pr: float, down_pr: float
+) -> float:
     """
     Computes the price of a zero coupon bond with F = $1
     given a forward rate assuming a binomial model where the forward rate
