@@ -20,3 +20,6 @@
 
 # tex aux files
 **/tex-aux
+
+# VSCodeCounter
+.VSCodeCounter
